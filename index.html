@@ -563,19 +563,21 @@
       // browse: 황금 잠금 버튼 숨기기
       document.getElementById("btn-lock").style.display = (r==="browse") ? "none" : "flex";
 
-      // Firebase 연결 여부
-      if(r==="host"||r==="viewer"){
-        fbUnsubscribe = onValue(ref(db,DB_PATH),snap=>{
-          assigned=snap.val()??emptyAssigned();
-          renderAll();
-        });
-      } else {
-        // browse: Firebase 없이 로컬만 — 화면이 보인 다음 프레임에 렌더
-        requestAnimationFrame(()=>renderAll());
-      }
-
       // 버튼 권한 설정
       applyPermissions();
+
+      // 브라우저가 layout을 완전히 계산한 뒤 렌더 (display:none → block 직후 SVG 렌더 버그 방지)
+      setTimeout(()=>{
+        if(r==="host"||r==="viewer"){
+          fbUnsubscribe = onValue(ref(db,DB_PATH),snap=>{
+            assigned=snap.val()??emptyAssigned();
+            renderAll();
+          });
+        } else {
+          // browse: Firebase 없이 로컬만
+          renderAll();
+        }
+      }, 50);
     }
 
     function applyPermissions(){
@@ -634,7 +636,7 @@
 
     function renderSVG(){
       const svg=document.getElementById("map-svg");
-      if(!svg)return;
+      if(!svg || svg.clientWidth===0) return;
       let g=document.getElementById("tables-group");
       if(g)g.remove();
       g=svgEl("g",{id:"tables-group"});
