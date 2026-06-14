@@ -560,6 +560,9 @@
         bar.innerHTML='<span>🔍 둘러보기 모드</span> <span class="role-badge role-browse">실시간 공유 없음</span>';
       }
 
+      // browse: 황금 잠금 버튼 숨기기
+      document.getElementById("btn-lock").style.display = (r==="browse") ? "none" : "flex";
+
       // Firebase 연결 여부
       if(r==="host"||r==="viewer"){
         fbUnsubscribe = onValue(ref(db,DB_PATH),snap=>{
@@ -567,8 +570,8 @@
           renderAll();
         });
       } else {
-        // browse: Firebase 없이 로컬만
-        renderAll();
+        // browse: Firebase 없이 로컬만 — 화면이 보인 다음 프레임에 렌더
+        requestAnimationFrame(()=>renderAll());
       }
 
       // 버튼 권한 설정
@@ -576,15 +579,16 @@
     }
 
     function applyPermissions(){
-      const isHost    = role==="host";
-      const canDraw   = isHost;
-      const canReset  = isHost;
-      const canLock   = isHost;
+      const isHost   = role==="host";
+      const isBrowse = role==="browse";
+      const canDraw  = isHost || isBrowse;
+      const canReset = isHost || isBrowse;
+      const canLock  = isHost;
 
       document.getElementById("btn-leaders").disabled = !canDraw;
       document.getElementById("btn-members").disabled = !canDraw;
       document.getElementById("btn-reset").disabled   = !canReset;
-      document.getElementById("btn-lock").style.cursor = canLock ? "pointer" : "default";
+      document.getElementById("btn-lock").style.cursor  = canLock ? "pointer" : "default";
       document.getElementById("btn-lock").style.opacity = canLock ? "1" : "0.6";
     }
 
