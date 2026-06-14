@@ -1,752 +1,601 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🌸 자리 뽑기</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
-    body {
-      min-height:100vh;
-      background:linear-gradient(160deg,#0D0D18 0%,#0A0A0F 50%,#080810 100%);
-      font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-      color:#fff;
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>🌸 자리 뽑기</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:linear-gradient(160deg,#0D0D18 0%,#0A0A0F 50%,#080810 100%);font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;color:#fff}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0}
+.orb-purple{width:400px;height:400px;top:-100px;left:-100px;background:radial-gradient(circle,rgba(94,92,230,.12) 0%,transparent 70%)}
+.orb-mint{width:300px;height:300px;bottom:0;right:-50px;background:radial-gradient(circle,rgba(45,212,191,.07) 0%,transparent 70%)}
 
-    /* ── 배경 orbs ── */
-    .orb { position:fixed; border-radius:50%; pointer-events:none; z-index:0; }
-    .orb-purple { width:400px;height:400px;top:-100px;left:-100px;
-      background:radial-gradient(circle,rgba(94,92,230,0.12) 0%,transparent 70%); }
-    .orb-mint { width:300px;height:300px;bottom:0;right:-50px;
-      background:radial-gradient(circle,rgba(45,212,191,0.07) 0%,transparent 70%); }
+/* 첫 화면 */
+#screen-entry{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:linear-gradient(160deg,#0D0D18 0%,#0A0A0F 50%,#080810 100%)}
+.entry-emoji{font-size:40px;margin-bottom:12px;text-align:center}
+.entry-sub{font-size:11px;font-weight:600;color:rgba(255,255,255,.38);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;text-align:center}
+.entry-title{font-size:20px;font-weight:700;text-align:center;margin-bottom:32px;letter-spacing:-.5px}
+.entry-card{width:100%;max-width:340px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:20px;padding:24px;backdrop-filter:blur(20px);margin-bottom:12px}
+.entry-card-title{font-size:13px;font-weight:700;margin-bottom:12px}
+.entry-pw-hint{font-size:11px;color:rgba(255,255,255,.3);text-align:center;margin-bottom:12px}
+.entry-pw-input{width:100%;padding:11px 14px;border-radius:12px;border:1px solid rgba(245,166,35,.3);background:rgba(255,255,255,.05);color:#fff;font-size:20px;text-align:center;letter-spacing:8px;outline:none;font-family:inherit;margin-bottom:8px}
+.entry-pw-input.error{border-color:rgba(255,80,80,.6)}
+.entry-error{font-size:12px;color:rgba(255,100,100,.9);text-align:center;margin-bottom:8px;display:none}
+.btn-entry-pw{width:100%;padding:13px;border-radius:12px;border:1px solid rgba(245,166,35,.45);background:linear-gradient(135deg,rgba(245,166,35,.22),rgba(245,130,10,.12));color:#FFD580;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn-entry-browse{width:100%;max-width:340px;padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);backdrop-filter:blur(20px);color:rgba(255,255,255,.55);font-weight:600;font-size:14px;cursor:pointer;font-family:inherit}
+.role-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.role-viewer{background:rgba(245,166,35,.2);color:#FFD580;border:1px solid rgba(245,166,35,.4)}
+.role-host{background:rgba(94,92,230,.25);color:#A8A6FF;border:1px solid rgba(94,92,230,.5)}
+.role-browse{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.12)}
 
-    /* ══════════════════════════════
-       첫 화면
-    ══════════════════════════════ */
-    #screen-entry {
-      position:fixed; inset:0; z-index:100;
-      display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      padding:32px 24px;
-      background:linear-gradient(160deg,#0D0D18 0%,#0A0A0F 50%,#080810 100%);
-    }
-    .entry-emoji { font-size:40px; margin-bottom:12px; text-align:center; }
-    .entry-sub {
-      font-size:11px; font-weight:600; color:rgba(255,255,255,0.38);
-      letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; text-align:center;
-    }
-    .entry-title {
-      font-size:20px; font-weight:700; text-align:center;
-      margin-bottom:32px; letter-spacing:-0.5px;
-    }
-    .entry-card {
-      width:100%; max-width:340px;
-      background:rgba(255,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.09);
-      border-radius:20px; padding:24px;
-      backdrop-filter:blur(20px);
-      margin-bottom:12px;
-    }
-    .entry-card-title {
-      font-size:13px; font-weight:700; margin-bottom:12px;
-      display:flex; align-items:center; gap:7px;
-    }
-    .entry-pw-input {
-      width:100%; padding:11px 14px; border-radius:12px;
-      border:1px solid rgba(245,166,35,0.3);
-      background:rgba(255,255,255,0.05); color:#fff;
-      font-size:20px; text-align:center; letter-spacing:8px;
-      outline:none; font-family:inherit; margin-bottom:8px;
-    }
-    .entry-pw-input.error { border-color:rgba(255,80,80,0.6); }
-    .entry-error {
-      font-size:12px; color:rgba(255,100,100,0.9);
-      text-align:center; margin-bottom:8px; display:none;
-    }
-    .entry-pw-hint {
-      font-size:11px; color:rgba(255,255,255,0.3);
-      text-align:center; margin-bottom:12px;
-    }
-    .btn-entry-pw {
-      width:100%; padding:13px; border-radius:12px;
-      border:1px solid rgba(245,166,35,0.45);
-      background:linear-gradient(135deg,rgba(245,166,35,0.22),rgba(245,130,10,0.12));
-      color:#FFD580; font-weight:700; font-size:14px;
-      cursor:pointer; font-family:inherit;
-      box-shadow:0 4px 20px rgba(245,166,35,0.15);
-    }
-    .btn-entry-browse {
-      width:100%; max-width:340px; padding:14px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,0.1);
-      background:rgba(255,255,255,0.05);
-      backdrop-filter:blur(20px);
-      color:rgba(255,255,255,0.55); font-weight:600; font-size:14px;
-      cursor:pointer; font-family:inherit;
-      transition:all 0.2s;
-    }
-    .role-badge {
-      display:inline-block; padding:2px 8px; border-radius:20px;
-      font-size:10px; font-weight:700;
-    }
-    .role-viewer  { background:rgba(245,166,35,0.2);  color:#FFD580;  border:1px solid rgba(245,166,35,0.4); }
-    .role-host    { background:rgba(94,92,230,0.25);  color:#A8A6FF;  border:1px solid rgba(94,92,230,0.5); }
-    .role-browse  { background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.12); }
+/* 메인 앱 */
+#screen-app{display:none;padding-bottom:48px}
+#role-bar{width:100%;padding:6px 16px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:11px;font-weight:600;backdrop-filter:blur(20px)}
+#role-bar.bar-browse{background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.4)}
+#role-bar.bar-viewer{background:rgba(245,166,35,.08);border-bottom:1px solid rgba(245,166,35,.2);color:#FFD580}
+#role-bar.bar-host{background:rgba(94,92,230,.1);border-bottom:1px solid rgba(94,92,230,.3);color:#A8A6FF}
+header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);border-bottom:1px solid rgba(255,255,255,.07);padding:18px 20px 14px}
+.header-sub{font-size:11px;font-weight:600;color:rgba(255,255,255,.38);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.header-title{font-size:20px;font-weight:700;letter-spacing:-.5px}
+.controls{position:relative;z-index:1;width:100%;max-width:600px;margin:0 auto;padding:20px 16px 0}
 
-    /* ══════════════════════════════
-       메인 앱
-    ══════════════════════════════ */
-    #screen-app { display:none; padding-bottom:48px; }
+/* 황금 버튼 */
+#btn-lock{width:100%;margin-bottom:10px;padding:13px 16px;border-radius:16px;border:1px solid rgba(245,166,35,.45);background:linear-gradient(135deg,rgba(245,166,35,.16),rgba(245,130,10,.08));backdrop-filter:blur(24px);box-shadow:0 0 0 1px rgba(245,166,35,.08),0 2px 16px rgba(245,166,35,.12);cursor:pointer;display:flex;align-items:center;gap:10px;overflow:hidden;font-family:inherit}
+#lock-icon{font-size:16px;flex-shrink:0}
+#lock-text{flex:1;overflow:hidden;min-width:0}
+.marquee-wrap{overflow:hidden;white-space:nowrap}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.marquee-inner{display:inline-block;animation:marquee 18s linear infinite;font-size:11px;color:rgba(255,213,128,.75);font-weight:500}
+.lock-confirmed{display:block;font-size:16px;font-weight:800;color:#FFD580;text-align:center}
+#lock-badge{flex-shrink:0;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(245,166,35,.15);color:#F5A623;border:1px solid rgba(245,166,35,.35)}
 
-    /* 역할 표시 바 */
-    #role-bar {
-      position:sticky; top:0; z-index:50;
-      width:100%; padding:6px 16px;
-      display:flex; align-items:center; justify-content:center; gap:8px;
-      font-size:11px; font-weight:600;
-      backdrop-filter:blur(20px);
-    }
-    #role-bar.bar-browse  { background:rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.07); color:rgba(255,255,255,0.4); }
-    #role-bar.bar-viewer  { background:rgba(245,166,35,0.08);  border-bottom:1px solid rgba(245,166,35,0.2);  color:#FFD580; }
-    #role-bar.bar-host    { background:rgba(94,92,230,0.1);    border-bottom:1px solid rgba(94,92,230,0.3);   color:#A8A6FF; }
+/* 보라/민트 버튼 */
+.btn-row{display:flex;gap:10px;margin-bottom:16px}
+.glass-btn{flex:1;padding:16px 12px;border-radius:18px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;line-height:1.4;text-align:center;transition:all .2s ease}
+.glass-btn:disabled{cursor:not-allowed;opacity:.35}
+#btn-leaders{border:1px solid rgba(94,92,230,.5);background:linear-gradient(145deg,rgba(94,92,230,.22),rgba(94,92,230,.10));backdrop-filter:blur(20px);box-shadow:0 4px 24px rgba(94,92,230,.25),inset 0 1px 0 rgba(255,255,255,.08)}
+#btn-members{border:1px solid rgba(45,212,191,.4);background:linear-gradient(145deg,rgba(45,212,191,.18),rgba(45,212,191,.08));backdrop-filter:blur(20px);box-shadow:0 4px 24px rgba(45,212,191,.2),inset 0 1px 0 rgba(255,255,255,.08)}
+.btn-icon{font-size:18px;display:block;margin-bottom:2px}
+.btn-sub{display:block;font-size:6.5px;opacity:.35;margin-top:4px;font-weight:400}
+.btn-count{display:block;font-size:11px;opacity:.6;margin-top:2px;font-weight:500}
 
-    header {
-      position:relative; z-index:1; width:100%;
-      background:rgba(255,255,255,0.03);
-      backdrop-filter:blur(30px);
-      border-bottom:1px solid rgba(255,255,255,0.07);
-      padding:18px 20px 14px;
-    }
-    .header-sub { font-size:11px;font-weight:600;color:rgba(255,255,255,0.38);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px; }
-    .header-title { font-size:20px;font-weight:700;letter-spacing:-0.5px; }
+/* 명단 패널 */
+.roster-wrap{margin-bottom:14px}
+#roster-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-radius:16px;border:1px solid rgba(245,166,35,.38);background:linear-gradient(135deg,rgba(245,166,35,.16),rgba(245,130,10,.08));backdrop-filter:blur(24px);box-shadow:0 0 0 1px rgba(245,166,35,.08),0 2px 16px rgba(245,166,35,.10);cursor:pointer;font-family:inherit;transition:all .22s ease}
+#roster-toggle.open{border-color:rgba(245,166,35,.55);border-radius:16px 16px 0 0;background:linear-gradient(135deg,rgba(245,166,35,.22),rgba(245,130,10,.12))}
+.roster-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.roster-title{font-size:14px;color:#FFD580;font-weight:700}
+.roster-badge{padding:1px 7px;border-radius:20px;font-size:10px;font-weight:700}
+.badge-purple{background:rgba(94,92,230,.25);color:#A8A6FF;border:1px solid rgba(94,92,230,.4)}
+.badge-mint{background:rgba(45,212,191,.18);color:#7FEEE5;border:1px solid rgba(45,212,191,.35)}
+#roster-chevron{width:28px;height:28px;border-radius:8px;background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.3);display:flex;align-items:center;justify-content:center;color:#F5A623;font-size:22px;flex-shrink:0;transition:transform .22s ease;line-height:1}
+#roster-body{display:none;padding:12px 14px 14px;border-radius:0 0 16px 16px;border:1px solid rgba(245,166,35,.55);border-top:none;background:rgba(255,255,255,.025);backdrop-filter:blur(20px)}
+.roster-section-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;opacity:.8}
+.roster-chips{display:flex;flex-wrap:wrap;gap:5px}
+.roster-divider{height:1px;background:rgba(255,255,255,.06);margin:10px 0}
+.name-chip{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;transition:all .3s}
+.leader-chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.3)}
+.leader-chip.taken{background:linear-gradient(135deg,rgba(94,92,230,.35),rgba(94,92,230,.2));border-color:rgba(94,92,230,.5);color:#C8C6FF}
+.member-chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.25)}
+.member-chip.taken{background:linear-gradient(135deg,rgba(45,212,191,.25),rgba(45,212,191,.12));border-color:rgba(45,212,191,.4);color:#9FECE4}
+.seat-label{font-size:9px;opacity:.6;font-weight:500}
 
-    .controls {
-      position:relative; z-index:1;
-      width:100%; max-width:600px; margin:0 auto;
-      padding:20px 16px 0;
-    }
+/* 지도 */
+.map-wrap{position:relative;z-index:1;width:100%;max-width:600px;margin:0 auto;padding:0 16px}
+.map-inner{border-radius:24px;overflow:hidden;border:1px solid rgba(94,92,230,.25);box-shadow:0 0 0 1px rgba(94,92,230,.1),0 24px 60px rgba(0,0,0,.7),0 0 80px rgba(94,92,230,.08);background:#0C0C1A}
+#map-svg{display:block;width:100%}
 
-    /* 황금 잠금 버튼 */
-    #btn-lock {
-      width:100%; margin-bottom:10px; padding:13px 16px;
-      border-radius:16px; border:1px solid rgba(245,166,35,0.45);
-      background:linear-gradient(135deg,rgba(245,166,35,0.16),rgba(245,130,10,0.08));
-      backdrop-filter:blur(24px);
-      box-shadow:0 0 0 1px rgba(245,166,35,0.08),0 2px 16px rgba(245,166,35,0.12);
-      cursor:pointer; display:flex; align-items:center; gap:10px;
-      overflow:hidden; font-family:inherit;
-    }
-    #lock-icon { font-size:16px; flex-shrink:0; }
-    #lock-text { flex:1; overflow:hidden; min-width:0; }
-    .marquee-wrap { overflow:hidden; white-space:nowrap; }
-    @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-    .marquee-inner {
-      display:inline-block; animation:marquee 18s linear infinite;
-      font-size:11px; color:rgba(255,213,128,0.75); font-weight:500;
-    }
-    .lock-confirmed { display:block;font-size:16px;font-weight:800;color:#FFD580;text-align:center; }
-    #lock-badge {
-      flex-shrink:0; padding:2px 8px; border-radius:20px;
-      font-size:10px; font-weight:700;
-      background:rgba(245,166,35,0.15); color:#F5A623;
-      border:1px solid rgba(245,166,35,0.35);
-    }
+/* 의자 - 기본(빈 자리) */
+.chair-back{fill:rgba(255,255,255,.07);stroke:rgba(255,255,255,.14);stroke-width:1}
+.chair-seat{fill:rgba(255,255,255,.07);stroke:rgba(255,255,255,.14);stroke-width:1.5}
+/* 의자 - 테이블장 */
+.chair-back.leader{fill:#5E5CE6;stroke:#8C8AF5;filter:url(#glowPurple)}
+.chair-seat.leader{fill:#5E5CE6;stroke:#8C8AF5;stroke-width:1.5;filter:url(#glowPurple)}
+/* 의자 - 일반 */
+.chair-back.member{fill:#2DD4BF;stroke:#5EEAD4;filter:url(#glowMint)}
+.chair-seat.member{fill:#2DD4BF;stroke:#5EEAD4;stroke-width:1.5;filter:url(#glowMint)}
+.chair-name{font-size:8px;font-weight:800;fill:#fff;pointer-events:none;user-select:none;font-family:-apple-system,sans-serif}
+.chair-name.member-name{fill:#00201C}
 
-    /* 보라/민트 버튼 */
-    .btn-row { display:flex; gap:10px; margin-bottom:16px; }
-    .glass-btn {
-      flex:1; padding:16px 12px; border-radius:18px;
-      font-family:inherit; font-size:14px; font-weight:700;
-      color:#fff; cursor:pointer; line-height:1.4; text-align:center;
-      transition:all 0.2s ease;
-    }
-    .glass-btn:disabled { cursor:not-allowed; opacity:0.35; }
-    #btn-leaders {
-      border:1px solid rgba(94,92,230,0.5);
-      background:linear-gradient(145deg,rgba(94,92,230,0.22),rgba(94,92,230,0.10));
-      backdrop-filter:blur(20px);
-      box-shadow:0 4px 24px rgba(94,92,230,0.25),inset 0 1px 0 rgba(255,255,255,0.08);
-    }
-    #btn-members {
-      border:1px solid rgba(45,212,191,0.4);
-      background:linear-gradient(145deg,rgba(45,212,191,0.18),rgba(45,212,191,0.08));
-      backdrop-filter:blur(20px);
-      box-shadow:0 4px 24px rgba(45,212,191,0.2),inset 0 1px 0 rgba(255,255,255,0.08);
-    }
-    .btn-icon  { font-size:18px; display:block; margin-bottom:2px; }
-    .btn-sub   { display:block; font-size:6.5px; opacity:0.35; margin-top:4px; font-weight:400; }
-    .btn-count { display:block; font-size:11px; opacity:0.6; margin-top:2px; font-weight:500; }
+/* 초기화 */
+.reset-wrap{position:relative;z-index:1;width:100%;max-width:600px;margin:0 auto;padding:20px 16px 0;display:flex;justify-content:center}
+#btn-reset{padding:12px 40px;border-radius:14px;border:1px solid rgba(245,166,35,.45);background:linear-gradient(135deg,rgba(245,166,35,.18),rgba(245,130,10,.10));backdrop-filter:blur(16px);color:#FFD580;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;box-shadow:0 2px 16px rgba(245,166,35,.15)}
+#btn-reset:disabled{opacity:.3;cursor:not-allowed}
 
-    /* 명단 패널 */
-    .roster-wrap { margin-bottom:14px; }
-    #roster-toggle {
-      width:100%; display:flex; align-items:center; justify-content:space-between;
-      padding:13px 16px; border-radius:16px;
-      border:1px solid rgba(245,166,35,0.38);
-      background:linear-gradient(135deg,rgba(245,166,35,0.16),rgba(245,130,10,0.08));
-      backdrop-filter:blur(24px);
-      box-shadow:0 0 0 1px rgba(245,166,35,0.08),0 2px 16px rgba(245,166,35,0.10);
-      cursor:pointer; font-family:inherit; transition:all 0.22s ease;
-    }
-    #roster-toggle.open {
-      border-color:rgba(245,166,35,0.55); border-radius:16px 16px 0 0;
-      background:linear-gradient(135deg,rgba(245,166,35,0.22),rgba(245,130,10,0.12));
-    }
-    .roster-left { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-    .roster-title { font-size:14px; color:#FFD580; font-weight:700; }
-    .roster-badge { padding:1px 7px; border-radius:20px; font-size:10px; font-weight:700; }
-    .badge-purple { background:rgba(94,92,230,0.25);color:#A8A6FF;border:1px solid rgba(94,92,230,0.4); }
-    .badge-mint   { background:rgba(45,212,191,0.18);color:#7FEEE5;border:1px solid rgba(45,212,191,0.35); }
-    #roster-chevron {
-      width:28px;height:28px;border-radius:8px;
-      background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.3);
-      display:flex;align-items:center;justify-content:center;
-      color:#F5A623;font-size:22px;flex-shrink:0;
-      transition:transform 0.22s ease; line-height:1;
-    }
-    #roster-body {
-      display:none; padding:12px 14px 14px;
-      border-radius:0 0 16px 16px;
-      border:1px solid rgba(245,166,35,0.55); border-top:none;
-      background:rgba(255,255,255,0.025); backdrop-filter:blur(20px);
-    }
-    .roster-section-label { font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;opacity:0.8; }
-    .roster-chips { display:flex; flex-wrap:wrap; gap:5px; }
-    .roster-divider { height:1px;background:rgba(255,255,255,0.06);margin:10px 0; }
-    .name-chip { padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;transition:all 0.3s; }
-    .leader-chip       { background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3); }
-    .leader-chip.taken { background:linear-gradient(135deg,rgba(94,92,230,0.35),rgba(94,92,230,0.2));border-color:rgba(94,92,230,0.5);color:#C8C6FF; }
-    .member-chip       { background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.25); }
-    .member-chip.taken { background:linear-gradient(135deg,rgba(45,212,191,0.25),rgba(45,212,191,0.12));border-color:rgba(45,212,191,0.4);color:#9FECE4; }
-    .seat-label { font-size:9px;opacity:0.6;font-weight:500; }
+/* 날아가는 칩 */
+.floating-chip{position:fixed;z-index:9999;pointer-events:none;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:800;font-family:-apple-system,sans-serif;white-space:nowrap;will-change:left,top,opacity,transform}
+.chip-leader{background:linear-gradient(135deg,#5E5CE6,#8C8AF5);color:#fff;box-shadow:0 0 16px rgba(94,92,230,.7)}
+.chip-member{background:linear-gradient(135deg,#2DD4BF,#5EEAD4);color:#00201C;box-shadow:0 0 16px rgba(45,212,191,.7)}
 
-    /* 지도 */
-    .map-wrap { position:relative;z-index:1;width:100%;max-width:600px;margin:0 auto;padding:0 16px; }
-    .map-inner {
-      border-radius:24px;overflow:hidden;
-      border:1px solid rgba(94,92,230,0.25);
-      box-shadow:0 0 0 1px rgba(94,92,230,0.1),0 24px 60px rgba(0,0,0,0.7),0 0 80px rgba(94,92,230,0.08);
-      background:#0C0C1A;
-    }
-    #map-svg { display:block; width:100%; }
-
-    /* 초기화 */
-    .reset-wrap { position:relative;z-index:1;width:100%;max-width:600px;margin:0 auto;padding:20px 16px 0;display:flex;justify-content:center; }
-    #btn-reset {
-      padding:12px 40px; border-radius:14px;
-      border:1px solid rgba(245,166,35,0.45);
-      background:linear-gradient(135deg,rgba(245,166,35,0.18),rgba(245,130,10,0.10));
-      backdrop-filter:blur(16px); color:#FFD580;
-      font-size:14px; font-weight:700; cursor:pointer;
-      font-family:inherit; letter-spacing:0.3px;
-      box-shadow:0 2px 16px rgba(245,166,35,0.15);
-    }
-    #btn-reset:disabled { opacity:0.3; cursor:not-allowed; }
-
-    /* 날아가는 칩 */
-    .floating-chip {
-      position:fixed;z-index:9999;pointer-events:none;
-      padding:4px 11px;border-radius:20px;
-      font-size:12px;font-weight:800;font-family:-apple-system,sans-serif;
-      white-space:nowrap;will-change:left,top,opacity,transform;
-    }
-    .chip-leader { background:linear-gradient(135deg,#5E5CE6,#8C8AF5);color:#fff;box-shadow:0 0 16px rgba(94,92,230,0.7); }
-    .chip-member { background:linear-gradient(135deg,#2DD4BF,#5EEAD4);color:#00201C;box-shadow:0 0 16px rgba(45,212,191,0.7); }
-
-    /* 비밀번호 모달 (뽑기 실행용) */
-    #modal-overlay {
-      display:none;position:fixed;inset:0;z-index:10000;
-      background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);
-      align-items:center;justify-content:center;padding:24px;
-    }
-    .modal-box {
-      background:linear-gradient(145deg,rgba(20,18,50,0.98),rgba(10,10,20,0.98));
-      border:1px solid rgba(245,166,35,0.5);border-radius:24px;
-      padding:28px 24px;width:100%;max-width:320px;
-      box-shadow:0 0 60px rgba(245,166,35,0.2);
-    }
-    .modal-emoji { font-size:28px;text-align:center;margin-bottom:8px; }
-    .modal-title { font-size:16px;font-weight:700;color:#FFD580;text-align:center;margin-bottom:4px; }
-    .modal-sub   { font-size:12px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:20px; }
-    .modal-pw-input {
-      width:100%;padding:12px 16px;border-radius:12px;
-      border:1px solid rgba(245,166,35,0.35);
-      background:rgba(255,255,255,0.05);color:#fff;
-      font-size:18px;text-align:center;letter-spacing:6px;
-      outline:none;font-family:inherit;
-    }
-    .modal-pw-input.error { border-color:rgba(255,80,80,0.6); }
-    .modal-error { display:none;color:rgba(255,100,100,0.9);font-size:12px;text-align:center;margin-top:8px; }
-    .modal-confirm {
-      width:100%;margin-top:16px;padding:13px;border-radius:12px;
-      border:1px solid rgba(245,166,35,0.5);
-      background:linear-gradient(135deg,rgba(245,166,35,0.3),rgba(245,120,10,0.2));
-      color:#FFD580;font-weight:700;font-size:15px;
-      cursor:pointer;font-family:inherit;
-    }
-  </style>
+/* 모달 */
+#modal-overlay{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:24px}
+.modal-box{background:linear-gradient(145deg,rgba(20,18,50,.98),rgba(10,10,20,.98));border:1px solid rgba(245,166,35,.5);border-radius:24px;padding:28px 24px;width:100%;max-width:320px;box-shadow:0 0 60px rgba(245,166,35,.2)}
+.modal-emoji{font-size:28px;text-align:center;margin-bottom:8px}
+.modal-title{font-size:16px;font-weight:700;color:#FFD580;text-align:center;margin-bottom:4px}
+.modal-sub{font-size:12px;color:rgba(255,255,255,.4);text-align:center;margin-bottom:20px}
+.modal-pw-input{width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(245,166,35,.35);background:rgba(255,255,255,.05);color:#fff;font-size:18px;text-align:center;letter-spacing:6px;outline:none;font-family:inherit}
+.modal-pw-input.error{border-color:rgba(255,80,80,.6)}
+.modal-error{display:none;color:rgba(255,100,100,.9);font-size:12px;text-align:center;margin-top:8px}
+.modal-confirm{width:100%;margin-top:16px;padding:13px;border-radius:12px;border:1px solid rgba(245,166,35,.5);background:linear-gradient(135deg,rgba(245,166,35,.3),rgba(245,120,10,.2));color:#FFD580;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+</style>
 </head>
 <body>
+<div class="orb orb-purple"></div>
+<div class="orb orb-mint"></div>
 
-  <div class="orb orb-purple"></div>
-  <div class="orb orb-mint"></div>
+<!-- 첫 화면 -->
+<div id="screen-entry">
+  <div class="entry-emoji">🌸🤤🍀</div>
+  <div class="entry-sub">양고기 먹으러 가기 전에</div>
+  <div class="entry-title">자리를 뽑아볼게요 🥵✨🥑</div>
+  <div class="entry-card">
+    <div class="entry-card-title">🔐 비밀번호로 입장</div>
+    <div class="entry-pw-hint">비밀번호를 입력하세요</div>
+    <input id="entry-pw" class="entry-pw-input" type="password" placeholder="••••••" maxlength="6"/>
+    <div id="entry-error" class="entry-error">틀렸어요 😅</div>
+    <button class="btn-entry-pw" onclick="submitEntryPw()">입장하기</button>
+  </div>
+  <button class="btn-entry-browse" onclick="enterApp('browse')">👀 &nbsp;앱 둘러보기 (실시간 공유 없음)</button>
+</div>
 
-  <!-- ══ 첫 화면 ══ -->
-  <div id="screen-entry">
-    <div class="entry-emoji">🌸🤤🍀</div>
-    <div class="entry-sub">양고기 먹으러 가기 전에</div>
-    <div class="entry-title">자리를 뽑아볼게요 🥵✨🥑</div>
+<!-- 메인 앱 -->
+<div id="screen-app">
+  <div id="role-bar"></div>
+  <header>
+    <div class="header-sub">양고기 먹으러 가기 전에</div>
+    <div class="header-title">🌸🤤🍀 자리를 뽑아볼게요 🥵✨🥑</div>
+  </header>
 
-    <!-- 비밀번호 입력 카드 -->
-    <div class="entry-card">
-      <div class="entry-card-title">
-        🔐 비밀번호로 입장
-      </div>
-      <div class="entry-pw-hint">비밀번호를 입력하세요</div>
-      <input id="entry-pw" class="entry-pw-input" type="password" placeholder="••••••" maxlength="6"/>
-      <div id="entry-error" class="entry-error">틀렸어요 😅</div>
-      <button class="btn-entry-pw" onclick="submitEntryPw()">입장하기</button>
+  <!-- 뽑기 비번 모달 -->
+  <div id="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-emoji">🔐</div>
+      <div class="modal-title">비밀번호 확인</div>
+      <div class="modal-sub">진행자 비밀번호를 입력하세요</div>
+      <input id="modal-pw" class="modal-pw-input" type="password" placeholder="비밀번호"/>
+      <div id="modal-error" class="modal-error">틀렸어요 😅</div>
+      <button class="modal-confirm" onclick="submitModalPw()">확인</button>
     </div>
+  </div>
 
-    <!-- 둘러보기 -->
-    <button class="btn-entry-browse" onclick="enterBrowse()">
-      👀 &nbsp;앱 둘러보기 (실시간 공유 없음)
+  <div class="controls">
+    <!-- 황금 잠금 버튼 -->
+    <button id="btn-lock" onclick="onLockClick()">
+      <span id="lock-icon">🔒</span>
+      <div id="lock-text">
+        <div class="marquee-wrap"><span class="marquee-inner">지금은 연습게임 ! 연습게임 ! 연습게임 ! 입니다 아래 보라색 민트색 버튼 등등 아무거나 눌러보세요 근데 이 버튼을 누르고 비밀번호를 누르면 진짜 찐 최종 확정입니다 근데 비밀번호는 조영서만 알아요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;지금은 연습게임 ! 연습게임 ! 연습게임 ! 입니다 아래 보라색 민트색 버튼 등등 아무거나 눌러보세요 근데 이 버튼을 누르고 비밀번호를 누르면 진짜 찐 최종 확정입니다 근데 비밀번호는 조영서만 알아요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </div>
+      <span id="lock-badge">잠금</span>
     </button>
-  </div>
-
-  <!-- ══ 메인 앱 ══ -->
-  <div id="screen-app">
-
-    <!-- 역할 표시 바 -->
-    <div id="role-bar"></div>
-
-    <header>
-      <div class="header-sub">양고기 먹으러 가기 전에</div>
-      <div class="header-title">🌸🤤🍀 자리를 뽑아볼게요 🥵✨🥑</div>
-    </header>
-
-    <!-- 뽑기 실행 비번 모달 -->
-    <div id="modal-overlay">
-      <div class="modal-box">
-        <div class="modal-emoji">🔐</div>
-        <div class="modal-title">비밀번호 확인</div>
-        <div class="modal-sub">진행자 비밀번호를 입력하세요</div>
-        <input id="modal-pw" class="modal-pw-input" type="password" placeholder="비밀번호"/>
-        <div id="modal-error" class="modal-error">틀렸어요 😅</div>
-        <button class="modal-confirm" onclick="submitModalPw()">확인</button>
-      </div>
-    </div>
-
-    <div class="controls">
-
-      <!-- 황금 잠금 버튼 -->
-      <button id="btn-lock" onclick="onLockClick()">
-        <span id="lock-icon">🔒</span>
-        <div id="lock-text">
-          <div class="marquee-wrap">
-            <span class="marquee-inner">지금은 연습게임 ! 연습게임 ! 연습게임 ! 입니다 아래 보라색 민트색 버튼 등등 아무거나 눌러보세요 근데 이 버튼을 누르고 비밀번호를 누르면 진짜 찐 최종 확정입니다 근데 비밀번호는 조영서만 알아요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;지금은 연습게임 ! 연습게임 ! 연습게임 ! 입니다 아래 보라색 민트색 버튼 등등 아무거나 눌러보세요 근데 이 버튼을 누르고 비밀번호를 누르면 진짜 찐 최종 확정입니다 근데 비밀번호는 조영서만 알아요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-          </div>
-        </div>
-        <span id="lock-badge">잠금</span>
+    <!-- 보라/민트 버튼 -->
+    <div class="btn-row">
+      <button id="btn-leaders" class="glass-btn" onclick="onDrawClick(true)">
+        <span class="btn-icon">👑</span>1) 테이블장 앉히기
+        <span class="btn-sub">여러분들과 친해지고 싶어요 .. ❣️</span>
+        <span class="btn-count" id="leader-count">0/8명 완료</span>
       </button>
-
-      <!-- 보라/민트 버튼 -->
-      <div class="btn-row">
-        <button id="btn-leaders" class="glass-btn" onclick="onDrawClick(true)">
-          <span class="btn-icon">👑</span>
-          1) 테이블장 앉히기
-          <span class="btn-sub">여러분들과 친해지고 싶어요 .. ❣️</span>
-          <span class="btn-count" id="leader-count">0/8명 완료</span>
-        </button>
-        <button id="btn-members" class="glass-btn" onclick="onDrawClick(false)">
-          <span class="btn-icon">🎲</span>
-          2) 사람들 앉히기
-          <span class="btn-sub">도파민을 위한 랜덤 ㄱㄱ</span>
-          <span class="btn-count" id="member-count">0/23명 완료</span>
-        </button>
-      </div>
-
-      <!-- 명단 패널 -->
-      <div class="roster-wrap">
-        <button id="roster-toggle" onclick="toggleRoster()">
-          <div class="roster-left">
-            <span class="roster-title">참석자 명단</span>
-            <span class="roster-badge badge-purple" id="badge-leaders">👑 0/8</span>
-            <span class="roster-badge badge-mint"   id="badge-members">★ 0/23</span>
-          </div>
-          <div id="roster-chevron">▾</div>
-        </button>
-        <div id="roster-body">
-          <div class="roster-section-label" style="color:#5E5CE6;">👑 테이블장</div>
-          <div class="roster-chips" id="roster-leaders"></div>
-          <div class="roster-divider"></div>
-          <div class="roster-section-label" style="color:#2DD4BF;">★ 일반 참석자</div>
-          <div class="roster-chips" id="roster-members"></div>
+      <button id="btn-members" class="glass-btn" onclick="onDrawClick(false)">
+        <span class="btn-icon">🎲</span>2) 사람들 앉히기
+        <span class="btn-sub">도파민을 위한 랜덤 ㄱㄱ</span>
+        <span class="btn-count" id="member-count">0/23명 완료</span>
+      </button>
+    </div>
+    <!-- 명단 패널 -->
+    <div class="roster-wrap">
+      <button id="roster-toggle" onclick="toggleRoster()">
+        <div class="roster-left">
+          <span class="roster-title">참석자 명단</span>
+          <span class="roster-badge badge-purple" id="badge-leaders">👑 0/8</span>
+          <span class="roster-badge badge-mint" id="badge-members">★ 0/23</span>
         </div>
-      </div>
-
-    </div>
-
-    <!-- 지도 -->
-    <div class="map-wrap">
-      <div class="map-inner">
-        <svg id="map-svg" viewBox="0 0 600 820">
-          <defs>
-            <pattern id="grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M40 0 L0 0 0 40" fill="none" stroke="rgba(94,92,230,0.07)" stroke-width="0.8"/>
-            </pattern>
-            <filter id="glowPurple" x="-40%" y="-40%" width="180%" height="180%">
-              <feGaussianBlur stdDeviation="3" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <filter id="glowMint" x="-40%" y="-40%" width="180%" height="180%">
-              <feGaussianBlur stdDeviation="3" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <filter id="glowPurpleSoft" x="-80%" y="-80%" width="260%" height="260%">
-              <feGaussianBlur stdDeviation="8" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
-          <rect width="600" height="820" fill="#0C0C1A"/>
-          <rect width="600" height="820" fill="url(#grid)"/>
-          <rect x="8" y="8" width="584" height="804" rx="16" fill="none" stroke="rgba(94,92,230,0.20)" stroke-width="1.5"/>
-          <line x1="300" y1="20" x2="300" y2="800" stroke="rgba(94,92,230,0.12)" stroke-width="1" stroke-dasharray="6,10"/>
-          <text x="150" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="rgba(94,92,230,0.45)" letter-spacing="2" font-family="-apple-system,sans-serif">LEFT</text>
-          <text x="450" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="rgba(94,92,230,0.45)" letter-spacing="2" font-family="-apple-system,sans-serif">RIGHT</text>
-          <text x="300" y="813" text-anchor="middle" font-size="10" font-weight="600" fill="rgba(255,255,255,0.2)" letter-spacing="1.5" font-family="-apple-system,sans-serif">ENTRANCE</text>
-          <line x1="260" y1="808" x2="340" y2="808" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-        </svg>
+        <div id="roster-chevron">▾</div>
+      </button>
+      <div id="roster-body">
+        <div class="roster-section-label" style="color:#5E5CE6">👑 테이블장</div>
+        <div class="roster-chips" id="roster-leaders"></div>
+        <div class="roster-divider"></div>
+        <div class="roster-section-label" style="color:#2DD4BF">★ 일반 참석자</div>
+        <div class="roster-chips" id="roster-members"></div>
       </div>
     </div>
-
-    <!-- 초기화 -->
-    <div class="reset-wrap">
-      <button id="btn-reset" onclick="onReset()">초기화</button>
-    </div>
-
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  <!-- 지도 — SVG 정적으로 완전히 그림 -->
+  <div class="map-wrap">
+    <div class="map-inner">
+      <svg id="map-svg" viewBox="0 0 600 820" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M40 0 L0 0 0 40" fill="none" stroke="rgba(94,92,230,0.07)" stroke-width="0.8"/>
+          </pattern>
+          <filter id="glowPurple" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glowMint" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glowPurpleSoft" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="8" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <rect width="600" height="820" fill="#0C0C1A"/>
+        <rect width="600" height="820" fill="url(#grid)"/>
+        <rect x="8" y="8" width="584" height="804" rx="16" fill="none" stroke="rgba(94,92,230,0.20)" stroke-width="1.5"/>
+        <line x1="300" y1="20" x2="300" y2="800" stroke="rgba(94,92,230,0.12)" stroke-width="1" stroke-dasharray="6,10"/>
+        <text x="150" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="rgba(94,92,230,0.45)" letter-spacing="2" font-family="-apple-system,sans-serif">LEFT</text>
+        <text x="450" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="rgba(94,92,230,0.45)" letter-spacing="2" font-family="-apple-system,sans-serif">RIGHT</text>
+        <text x="300" y="813" text-anchor="middle" font-size="10" font-weight="600" fill="rgba(255,255,255,0.2)" letter-spacing="1.5" font-family="-apple-system,sans-serif">ENTRANCE</text>
+        <line x1="260" y1="808" x2="340" y2="808" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
 
-    // ─── Firebase ────────────────────────────────
-    const firebaseConfig = {
-      apiKey:            "AIzaSyAmZrV4OnbYxmkC8HiqolPHcXKHVoxs444",
-      authDomain:        "seating-lottery-dpre.firebaseapp.com",
-      databaseURL:       "https://seating-lottery-dpre-default-rtdb.firebaseio.com",
-      projectId:         "seating-lottery-dpre",
-      storageBucket:     "seating-lottery-dpre.firebasestorage.app",
-      messagingSenderId: "680754375350",
-      appId:             "1:680754375350:web:e33d9a7f166dd7a0f85417",
-    };
-    const fbApp = initializeApp(firebaseConfig);
-    const db    = getDatabase(fbApp);
-    const DB_PATH = "seating-v1";
+        <!-- 테이블 A (x=150, y=100) 좌우 의자 -->
+        <g id="tbl-A">
+          <rect x="95" y="70" width="110" height="72" rx="16" fill="none" stroke="rgba(94,92,230,0.35)" stroke-width="8" opacity="0.4" filter="url(#glowPurpleSoft)"/>
+          <rect x="100" y="70" width="100" height="60" rx="10" fill="rgba(30,28,70,0.90)" stroke="rgba(94,92,230,0.55)" stroke-width="1.5"/>
+          <rect x="102" y="72" width="96" height="28" rx="8" fill="rgba(255,255,255,0.04)"/>
+          <text x="150" y="101" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="-apple-system,sans-serif" letter-spacing="1">A</text>
+          <!-- 왼쪽 의자 2개 -->
+          <g id="A1" transform="translate(65,82) rotate(90)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="A1-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90)"></text></g>
+          <g id="A2" transform="translate(65,118) rotate(90)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="A2-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90)"></text></g>
+          <!-- 오른쪽 의자 2개 -->
+          <g id="A3" transform="translate(235,82) rotate(270)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="A3-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-270)"></text></g>
+          <g id="A4" transform="translate(235,118) rotate(270)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="A4-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-270)"></text></g>
+        </g>
 
-    // ─── 상수 ────────────────────────────────────
-    const LEADERS = ["정윤","두환","서연","길수","동관","지원","영균","지훈"];
-    const MEMBERS = ["민주","해원","정환","보경","태명","이영","우석","제현","주경","찬희","창희","현진","후조","지혜","원희","해민","조영","민태","새한","정현","호현","지우","승하"];
-    const PW_VIEWER = "0911";
-    const PW_HOST   = "990911";
+        <!-- 테이블 B (x=150, y=230) -->
+        <g id="tbl-B">
+          <rect x="95" y="200" width="110" height="72" rx="16" fill="none" stroke="rgba(94,92,230,0.35)" stroke-width="8" opacity="0.4" filter="url(#glowPurpleSoft)"/>
+          <rect x="100" y="200" width="100" height="60" rx="10" fill="rgba(30,28,70,0.90)" stroke="rgba(94,92,230,0.55)" stroke-width="1.5"/>
+          <rect x="102" y="202" width="96" height="28" rx="8" fill="rgba(255,255,255,0.04)"/>
+          <text x="150" y="231" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="-apple-system,sans-serif" letter-spacing="1">B</text>
+          <g id="B1" transform="translate(65,212) rotate(90)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="B1-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90)"></text></g>
+          <g id="B2" transform="translate(65,248) rotate(90)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="B2-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90)"></text></g>
+          <g id="B3" transform="translate(235,212) rotate(270)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="B3-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-270)"></text></g>
+          <g id="B4" transform="translate(235,248) rotate(270)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="B4-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-270)"></text></g>
+        </g>
 
-    const TW=100,TH=60,CR=15;
-    const LX=150,LYS=[100,230,360,490,620];
-    const RX=450,RYS=[160,380,600];
+        <!-- 테이블 C (x=150, y=360) -->
+        <g id="tbl-C">
+          <rect x="95" y="330" width="110" height="72" rx="16" fill="none" stroke="rgba(94,92,230,0.35)" stroke-width="8" opacity="0.4" filter="url(#glowPurpleSoft)"/>
+          <rect x="100" y="330" width="100" height="60" rx="10" fill="rgba(30,28,70,0.90)" stroke="rgba(94,92,230,0.55)" stroke-width="1.5"/>
+          <rect x="102" y="332" width="96" height="28" rx="8" fill="rgba(255,255,255,0.04)"/>
+          <text x="150" y="361" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="-apple-system,sans-serif" letter-spacing="1">C</text>
+          <g id="C1" transform="translate(65,342) rotate(90)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="C1-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90)"></text></g>
+          <g id="C2" transform="translate(65,378) rotate(90)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="C2-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90)"></text></g>
+          <g id="C3" transform="translate(235,342) rotate(270)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="C3-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-270)"></text></g>
+          <g id="C4" transform="translate(235,378) rotate(270)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="C4-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-270)"></text></g>
+        </g>
 
-    function makeSeat(id,dx,dy,dir){return{id,dx,dy,dir};}
-    const TABLES=[
-      ...LYS.map((y,i)=>{const id=String.fromCharCode(65+i);return{id,label:id,x:LX,y,w:TW,h:TH,seats:[makeSeat(`${id}1`,-(TW/2+CR+6),-18,90),makeSeat(`${id}2`,-(TW/2+CR+6),18,90),makeSeat(`${id}3`,(TW/2+CR+6),-18,270),makeSeat(`${id}4`,(TW/2+CR+6),18,270)]};}),
-      ...RYS.map((y,i)=>{const id=String.fromCharCode(70+i);return{id,label:id,x:RX,y,w:TW,h:TH,seats:[makeSeat(`${id}1`,-20,-(TH/2+CR+6),180),makeSeat(`${id}2`,20,-(TH/2+CR+6),180),makeSeat(`${id}3`,-20,(TH/2+CR+6),0),makeSeat(`${id}4`,20,(TH/2+CR+6),0)]};})
-    ];
-    const ALL_SEATS=TABLES.flatMap(t=>t.seats.map(s=>({...s,tableId:t.id,cx:t.x+s.dx,cy:t.y+s.dy})));
-    function emptyAssigned(){const o={};ALL_SEATS.forEach(s=>{o[s.id]=null;});return o;}
-    function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+        <!-- 테이블 D (x=150, y=490) -->
+        <g id="tbl-D">
+          <rect x="95" y="460" width="110" height="72" rx="16" fill="none" stroke="rgba(94,92,230,0.35)" stroke-width="8" opacity="0.4" filter="url(#glowPurpleSoft)"/>
+          <rect x="100" y="460" width="100" height="60" rx="10" fill="rgba(30,28,70,0.90)" stroke="rgba(94,92,230,0.55)" stroke-width="1.5"/>
+          <rect x="102" y="462" width="96" height="28" rx="8" fill="rgba(255,255,255,0.04)"/>
+          <text x="150" y="491" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="-apple-system,sans-serif" letter-spacing="1">D</text>
+          <g id="D1" transform="translate(65,472) rotate(90)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="D1-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90)"></text></g>
+          <g id="D2" transform="translate(65,508) rotate(90)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="D2-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90)"></text></g>
+          <g id="D3" transform="translate(235,472) rotate(270)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="D3-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-270)"></text></g>
+          <g id="D4" transform="translate(235,508) rotate(270)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="D4-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-270)"></text></g>
+        </g>
 
-    // ─── 상태 ────────────────────────────────────
-    // role: 'browse' | 'viewer' | 'host'
-    let role     = null;
-    let assigned = emptyAssigned();
-    let locked   = true;   // 황금버튼 상태
-    let phase    = "idle";
-    let pendingDraw = null;
-    let rosterOpen  = false;
-    let fbUnsubscribe = null;
+        <!-- 테이블 E (x=150, y=620) -->
+        <g id="tbl-E">
+          <rect x="95" y="590" width="110" height="72" rx="16" fill="none" stroke="rgba(94,92,230,0.35)" stroke-width="8" opacity="0.4" filter="url(#glowPurpleSoft)"/>
+          <rect x="100" y="590" width="100" height="60" rx="10" fill="rgba(30,28,70,0.90)" stroke="rgba(94,92,230,0.55)" stroke-width="1.5"/>
+          <rect x="102" y="592" width="96" height="28" rx="8" fill="rgba(255,255,255,0.04)"/>
+          <text x="150" y="621" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="-apple-system,sans-serif" letter-spacing="1">E</text>
+          <g id="E1" transform="translate(65,602) rotate(90)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="E1-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90)"></text></g>
+          <g id="E2" transform="translate(65,638) rotate(90)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="E2-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90)"></text></g>
+          <g id="E3" transform="translate(235,602) rotate(270)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="E3-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-270)"></text></g>
+          <g id="E4" transform="translate(235,638) rotate(270)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="E4-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-270)"></text></g>
+        </g>
 
-    // ─── 전역 함수 (HTML onclick에서 호출) ────────
-    window.submitEntryPw = function(){
-      const val = document.getElementById("entry-pw").value.trim();
-      const errEl = document.getElementById("entry-error");
-      const input = document.getElementById("entry-pw");
-      if(val === PW_HOST){ enterApp("host"); }
-      else if(val === PW_VIEWER){ enterApp("viewer"); }
-      else {
-        errEl.style.display="block";
-        input.classList.add("error");
-        input.value="";
-        setTimeout(()=>{ errEl.style.display="none"; input.classList.remove("error"); },2000);
-      }
-    };
-    document.getElementById("entry-pw").addEventListener("keydown",e=>{ if(e.key==="Enter") window.submitEntryPw(); });
+        <!-- 테이블 F (x=450, y=160) 상하 의자 -->
+        <g id="tbl-F">
+          <rect x="395" y="125" width="110" height="72" rx="16" fill="none" stroke="rgba(94,92,230,0.35)" stroke-width="8" opacity="0.4" filter="url(#glowPurpleSoft)"/>
+          <rect x="400" y="130" width="100" height="60" rx="10" fill="rgba(30,28,70,0.90)" stroke="rgba(94,92,230,0.55)" stroke-width="1.5"/>
+          <rect x="402" y="132" width="96" height="28" rx="8" fill="rgba(255,255,255,0.04)"/>
+          <text x="450" y="161" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="-apple-system,sans-serif" letter-spacing="1">F</text>
+          <!-- 위쪽 의자 2개 -->
+          <g id="F1" transform="translate(430,106) rotate(180)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="F1-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-180)"></text></g>
+          <g id="F2" transform="translate(470,106) rotate(180)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="F2-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-180)"></text></g>
+          <!-- 아래쪽 의자 2개 -->
+          <g id="F3" transform="translate(430,214) rotate(0)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="F3-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(0)"></text></g>
+          <g id="F4" transform="translate(470,214) rotate(0)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="F4-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(0)"></text></g>
+        </g>
 
-    window.enterBrowse = function(){ enterApp("browse"); };
+        <!-- 테이블 G (x=450, y=380) -->
+        <g id="tbl-G">
+          <rect x="395" y="345" width="110" height="72" rx="16" fill="none" stroke="rgba(94,92,230,0.35)" stroke-width="8" opacity="0.4" filter="url(#glowPurpleSoft)"/>
+          <rect x="400" y="350" width="100" height="60" rx="10" fill="rgba(30,28,70,0.90)" stroke="rgba(94,92,230,0.55)" stroke-width="1.5"/>
+          <rect x="402" y="352" width="96" height="28" rx="8" fill="rgba(255,255,255,0.04)"/>
+          <text x="450" y="381" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="-apple-system,sans-serif" letter-spacing="1">G</text>
+          <g id="G1" transform="translate(430,326) rotate(180)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="G1-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-180)"></text></g>
+          <g id="G2" transform="translate(470,326) rotate(180)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="G2-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-180)"></text></g>
+          <g id="G3" transform="translate(430,434) rotate(0)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="G3-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(0)"></text></g>
+          <g id="G4" transform="translate(470,434) rotate(0)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="G4-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(0)"></text></g>
+        </g>
 
-    window.onLockClick = function(){
-      // host만 황금버튼 누를 수 있음
-      if(role!=="host") return;
-      showModal("unlock");
-    };
+        <!-- 테이블 H (x=450, y=600) -->
+        <g id="tbl-H">
+          <rect x="395" y="565" width="110" height="72" rx="16" fill="none" stroke="rgba(94,92,230,0.35)" stroke-width="8" opacity="0.4" filter="url(#glowPurpleSoft)"/>
+          <rect x="400" y="570" width="100" height="60" rx="10" fill="rgba(30,28,70,0.90)" stroke="rgba(94,92,230,0.55)" stroke-width="1.5"/>
+          <rect x="402" y="572" width="96" height="28" rx="8" fill="rgba(255,255,255,0.04)"/>
+          <text x="450" y="601" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="-apple-system,sans-serif" letter-spacing="1">H</text>
+          <g id="H1" transform="translate(430,546) rotate(180)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="H1-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-180)"></text></g>
+          <g id="H2" transform="translate(470,546) rotate(180)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="H2-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-180)"></text></g>
+          <g id="H3" transform="translate(430,654) rotate(0)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="H3-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(0)"></text></g>
+          <g id="H4" transform="translate(470,654) rotate(0)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="H4-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(0)"></text></g>
+        </g>
+      </svg>
+    </div>
+  </div>
 
-    window.onDrawClick = function(isLeader){
-      if(phase!=="idle") return;
-      if(role!=="host") return; // host만
-      if(!locked){ pendingDraw=isLeader; showModal("confirm"); }
-      else doExecuteDraw(isLeader);
-    };
+  <div class="reset-wrap">
+    <button id="btn-reset" onclick="onReset()">초기화</button>
+  </div>
+</div>
 
-    window.onReset = function(){
-      if(phase!=="idle") return;
-      if(role!=="host") return;
-      set(ref(db,DB_PATH),null);
-    };
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    window.toggleRoster = function(){
-      rosterOpen=!rosterOpen;
-      const tog=document.getElementById("roster-toggle");
-      const chev=document.getElementById("roster-chevron");
-      tog.classList.toggle("open",rosterOpen);
-      chev.style.transform=rosterOpen?"rotate(180deg)":"none";
-      renderRoster();
-    };
+const firebaseConfig = {
+  apiKey:"AIzaSyAmZrV4OnbYxmkC8HiqolPHcXKHVoxs444",
+  authDomain:"seating-lottery-dpre.firebaseapp.com",
+  databaseURL:"https://seating-lottery-dpre-default-rtdb.firebaseio.com",
+  projectId:"seating-lottery-dpre",
+  storageBucket:"seating-lottery-dpre.firebasestorage.app",
+  messagingSenderId:"680754375350",
+  appId:"1:680754375350:web:e33d9a7f166dd7a0f85417",
+};
+const db = getDatabase(initializeApp(firebaseConfig));
+const DB_PATH = "seating-v1";
 
-    window.submitModalPw = function(){
-      const val=document.getElementById("modal-pw").value;
-      const errEl=document.getElementById("modal-error");
-      const input=document.getElementById("modal-pw");
-      if(val===PW_HOST){
-        document.getElementById("modal-overlay").style.display="none";
-        input.value=""; errEl.style.display="none";
-        if(pendingDraw==="unlock"){ locked=false; renderButtons(); }
-        else if(pendingDraw!==null){ const d=pendingDraw; pendingDraw=null; doExecuteDraw(d); }
-      } else {
-        errEl.style.display="block"; input.classList.add("error"); input.value="";
-        setTimeout(()=>{ errEl.style.display="none"; input.classList.remove("error"); },2000);
-      }
-    };
-    document.getElementById("modal-pw").addEventListener("keydown",e=>{ if(e.key==="Enter") window.submitModalPw(); });
-    document.getElementById("modal-overlay").addEventListener("click",e=>{
-      if(e.target===document.getElementById("modal-overlay")){
-        document.getElementById("modal-overlay").style.display="none";
-      }
+const LEADERS = ["정윤","두환","서연","길수","동관","지원","영균","지훈"];
+const MEMBERS = ["민주","해원","정환","보경","태명","이영","우석","제현","주경","찬희","창희","현진","후조","지혜","원희","해민","조영","민태","새한","정현","호현","지우","승하"];
+const PW_VIEWER="0911", PW_HOST="990911";
+
+// 모든 자리 목록 (SVG id와 1:1 매칭)
+const ALL_SEAT_IDS = ["A1","A2","A3","A4","B1","B2","B3","B4","C1","C2","C3","C4","D1","D2","D3","D4","E1","E2","E3","E4","F1","F2","F3","F4","G1","G2","G3","G4","H1","H2","H3","H4"];
+// 테이블별 자리
+const TABLE_SEATS = {A:["A1","A2","A3","A4"],B:["B1","B2","B3","B4"],C:["C1","C2","C3","C4"],D:["D1","D2","D3","D4"],E:["E1","E2","E3","E4"],F:["F1","F2","F3","F4"],G:["G1","G2","G3","G4"],H:["H1","H2","H3","H4"]};
+const TABLE_IDS = ["A","B","C","D","E","F","G","H"];
+
+function emptyAssigned(){const o={};ALL_SEAT_IDS.forEach(id=>{o[id]=null;});return o;}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+let role=null, assigned=emptyAssigned(), locked=true, phase="idle", pendingDraw=null, rosterOpen=false;
+
+// ── 의자 업데이트 (SVG 요소 직접 수정) ──────────────
+function updateChair(seatId, name){
+  const g = document.getElementById(seatId);
+  if(!g) return;
+  const back = g.querySelector('.chair-back');
+  const seat = g.querySelector('.chair-seat');
+  const txt  = g.querySelector('.chair-name');
+  const isLeader = LEADERS.includes(name);
+  const taken = !!name;
+
+  if(taken && isLeader){
+    back.setAttribute('class','chair-back leader');
+    seat.setAttribute('class','chair-seat leader');
+    txt.setAttribute('class','chair-name');
+    txt.textContent = name;
+  } else if(taken){
+    back.setAttribute('class','chair-back member');
+    seat.setAttribute('class','chair-seat member');
+    txt.setAttribute('class','chair-name member-name');
+    txt.setAttribute('font-size', name.length>2 ? '7' : '8');
+    txt.textContent = name;
+  } else {
+    back.setAttribute('class','chair-back');
+    seat.setAttribute('class','chair-seat');
+    txt.textContent = '';
+  }
+}
+
+function renderAll(){
+  // 의자 전체 업데이트
+  ALL_SEAT_IDS.forEach(id => updateChair(id, assigned[id]));
+  // 카운터
+  const lDone=LEADERS.filter(n=>Object.values(assigned).includes(n)).length;
+  const mDone=MEMBERS.filter(n=>Object.values(assigned).includes(n)).length;
+  document.getElementById('leader-count').textContent=`${lDone}/8명 완료`;
+  document.getElementById('member-count').textContent=`${mDone}/23명 완료`;
+  document.getElementById('badge-leaders').textContent=`👑 ${lDone}/${LEADERS.length}`;
+  document.getElementById('badge-members').textContent=`★ ${mDone}/${MEMBERS.length}`;
+  // 잠금 버튼
+  document.getElementById('lock-icon').textContent=locked?'🔒':'🔓';
+  document.getElementById('lock-badge').textContent=locked?'잠금':'해제';
+  document.getElementById('lock-text').innerHTML=locked
+    ?`<div class="marquee-wrap"><span class="marquee-inner">지금은 연습게임 ! 연습게임 ! 연습게임 ! 입니다 아래 보라색 민트색 버튼 등등 아무거나 눌러보세요 근데 이 버튼을 누르고 비밀번호를 누르면 진짜 찐 최종 확정입니다 근데 비밀번호는 조영서만 알아요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;지금은 연습게임 ! 연습게임 ! 연습게임 ! 입니다 아래 보라색 민트색 버튼 등등 아무거나 눌러보세요 근데 이 버튼을 누르고 비밀번호를 누르면 진짜 찐 최종 확정입니다 근데 비밀번호는 조영서만 알아요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>`
+    :`<span class="lock-confirmed">✅ 진짜 최종 확정</span>`;
+  // 명단 패널
+  if(rosterOpen) renderRoster();
+}
+
+function renderRoster(){
+  const lw=document.getElementById('roster-leaders'); lw.innerHTML='';
+  LEADERS.forEach(name=>{
+    const seat=Object.keys(assigned).find(k=>assigned[k]===name)||null;
+    const d=document.createElement('div');
+    d.className='name-chip leader-chip'+(seat?' taken':'');
+    d.innerHTML=name+(seat?`<span class="seat-label">${seat}</span>`:'');
+    lw.appendChild(d);
+  });
+  const mw=document.getElementById('roster-members'); mw.innerHTML='';
+  MEMBERS.forEach(name=>{
+    const seat=Object.keys(assigned).find(k=>assigned[k]===name)||null;
+    const d=document.createElement('div');
+    d.className='name-chip member-chip'+(seat?' taken':'');
+    d.innerHTML=name+(seat?`<span class="seat-label">${seat}</span>`:'');
+    mw.appendChild(d);
+  });
+}
+
+// ── 입장 ─────────────────────────────────────────────
+window.enterApp = function(r){
+  role=r;
+  document.getElementById('screen-entry').style.display='none';
+  document.getElementById('screen-app').style.display='block';
+  const bar=document.getElementById('role-bar');
+  if(r==='host'){bar.className='bar-host';bar.innerHTML='<span>👑 진행자 모드</span><span class="role-badge role-host" style="margin-left:8px">모든 기능 사용 가능</span>';}
+  else if(r==='viewer'){bar.className='bar-viewer';bar.innerHTML='<span>👀 참석자 모드</span><span class="role-badge role-viewer" style="margin-left:8px">명단 보기만 가능</span>';}
+  else{bar.className='bar-browse';bar.innerHTML='<span>🔍 둘러보기 모드</span><span class="role-badge role-browse" style="margin-left:8px">실시간 공유 없음</span>';}
+
+  document.getElementById('btn-lock').style.display=(r==='browse')?'none':'flex';
+  document.getElementById('btn-leaders').disabled=(r==='viewer');
+  document.getElementById('btn-members').disabled=(r==='viewer');
+  document.getElementById('btn-reset').disabled=(r==='viewer');
+
+  renderAll(); // SVG는 이미 HTML에 있으므로 즉시 렌더 가능
+
+  if(r==='host'||r==='viewer'){
+    onValue(ref(db,DB_PATH),snap=>{
+      assigned=snap.val()??emptyAssigned();
+      renderAll();
     });
+  }
+};
 
-    // ─── 입장 ────────────────────────────────────
-    function enterApp(r){
-      role=r;
-      document.getElementById("screen-entry").style.display="none";
-      document.getElementById("screen-app").style.display="block";
+window.submitEntryPw = function(){
+  const val=document.getElementById('entry-pw').value.trim();
+  if(val===PW_HOST) window.enterApp('host');
+  else if(val===PW_VIEWER) window.enterApp('viewer');
+  else{
+    document.getElementById('entry-error').style.display='block';
+    document.getElementById('entry-pw').classList.add('error');
+    document.getElementById('entry-pw').value='';
+    setTimeout(()=>{document.getElementById('entry-error').style.display='none';document.getElementById('entry-pw').classList.remove('error');},2000);
+  }
+};
+document.getElementById('entry-pw').addEventListener('keydown',e=>{if(e.key==='Enter')window.submitEntryPw();});
 
-      // 역할 바
-      const bar=document.getElementById("role-bar");
-      if(r==="host"){
-        bar.className="bar-host";
-        bar.innerHTML='<span>👑 진행자 모드</span> <span class="role-badge role-host">모든 기능 사용 가능</span>';
-      } else if(r==="viewer"){
-        bar.className="bar-viewer";
-        bar.innerHTML='<span>👀 참석자 모드</span> <span class="role-badge role-viewer">명단 보기만 가능</span>';
-      } else {
-        bar.className="bar-browse";
-        bar.innerHTML='<span>🔍 둘러보기 모드</span> <span class="role-badge role-browse">실시간 공유 없음</span>';
-      }
+// ── 뽑기 ─────────────────────────────────────────────
+window.onDrawClick = function(isLeader){
+  if(phase!=='idle') return;
+  if(!locked){ pendingDraw=isLeader; showModal(); }
+  else doExecuteDraw(isLeader);
+};
 
-      // browse: 황금 잠금 버튼 숨기기
-      document.getElementById("btn-lock").style.display = (r==="browse") ? "none" : "flex";
+function doExecuteDraw(isLeader){
+  if(phase!=='idle') return;
+  phase='animating';
+  document.getElementById('btn-leaders').disabled=true;
+  document.getElementById('btn-members').disabled=true;
+  document.getElementById('btn-reset').disabled=true;
 
-      // 버튼 권한 설정
-      applyPermissions();
+  const list=isLeader?LEADERS:MEMBERS;
+  const base={...assigned};
+  Object.keys(base).forEach(k=>{if(list.includes(base[k]))base[k]=null;});
 
-      // 브라우저가 layout을 완전히 계산한 뒤 렌더 (display:none → block 직후 SVG 렌더 버그 방지)
-      setTimeout(()=>{
-        if(r==="host"||r==="viewer"){
-          fbUnsubscribe = onValue(ref(db,DB_PATH),snap=>{
-            assigned=snap.val()??emptyAssigned();
-            renderAll();
-          });
-        } else {
-          // browse: Firebase 없이 로컬만
-          renderAll();
-        }
-      }, 50);
+  let resultMap={};
+  if(isLeader){
+    const sL=shuffle(LEADERS), sT=shuffle(TABLE_IDS);
+    sT.forEach((tid,i)=>{
+      const seats=shuffle(TABLE_SEATS[tid]);
+      resultMap[seats[0]]=sL[i];
+    });
+  } else {
+    const empty=ALL_SEAT_IDS.filter(id=>!base[id]);
+    const sS=shuffle(empty), sM=shuffle(MEMBERS);
+    sM.forEach((n,idx)=>{if(idx<sS.length)resultMap[sS[idx]]=n;});
+  }
+
+  // 칩 날리기
+  const btnEl=document.getElementById(isLeader?'btn-leaders':'btn-members');
+  const btnR=btnEl.getBoundingClientRect();
+  const ox=btnR.left+btnR.width/2-24, oy=btnR.top+btnR.height/2-12;
+  const delays=Object.entries(resultMap).map(([seatId,name],i)=>{
+    const chairEl=document.getElementById(seatId);
+    let ex=ox,ey=oy;
+    if(chairEl){
+      const r2=chairEl.getBoundingClientRect();
+      ex=r2.left+r2.width/2-24; ey=r2.top+r2.height/2-12;
     }
+    const delay=i*(isLeader?0.045:0.028);
+    launchChip(name,LEADERS.includes(name),ox,oy,ex,ey,delay);
+    return delay;
+  });
 
-    function applyPermissions(){
-      const isHost   = role==="host";
-      const isBrowse = role==="browse";
-      const canDraw  = isHost || isBrowse;
-      const canReset = isHost || isBrowse;
-      const canLock  = isHost;
+  const maxDelay=((delays.length>0?Math.max(...delays):0)+0.8)*1000;
+  setTimeout(()=>{
+    const next={...base,...resultMap};
+    if(role==='host'||role==='viewer') set(ref(db,DB_PATH),next);
+    else { assigned=next; renderAll(); }
+    phase='idle';
+    document.getElementById('btn-leaders').disabled=(role==='viewer');
+    document.getElementById('btn-members').disabled=(role==='viewer');
+    document.getElementById('btn-reset').disabled=(role==='viewer');
+  },maxDelay);
+}
 
-      document.getElementById("btn-leaders").disabled = !canDraw;
-      document.getElementById("btn-members").disabled = !canDraw;
-      document.getElementById("btn-reset").disabled   = !canReset;
-      document.getElementById("btn-lock").style.cursor  = canLock ? "pointer" : "default";
-      document.getElementById("btn-lock").style.opacity = canLock ? "1" : "0.6";
-    }
+function launchChip(name,isLeader,sx,sy,ex,ey,delay){
+  const c=document.createElement('div');
+  c.className='floating-chip '+(isLeader?'chip-leader':'chip-member');
+  c.textContent=name; c.style.left=sx+'px'; c.style.top=sy+'px';
+  document.body.appendChild(c);
+  setTimeout(()=>{
+    c.style.transition='left 0.6s cubic-bezier(0.22,1,0.36,1),top 0.6s cubic-bezier(0.22,1,0.36,1),opacity 0.15s ease 0.48s,transform 0.6s ease';
+    c.style.left=ex+'px'; c.style.top=ey+'px'; c.style.opacity='0'; c.style.transform='scale(0.6)';
+  },delay*1000+30);
+  setTimeout(()=>c.remove(),(delay+0.8)*1000);
+}
 
-    // ─── 모달 ─────────────────────────────────────
-    function showModal(mode){
-      pendingDraw = mode==="unlock" ? "unlock" : pendingDraw;
-      document.getElementById("modal-pw").value="";
-      document.getElementById("modal-error").style.display="none";
-      document.getElementById("modal-overlay").style.display="flex";
-      setTimeout(()=>document.getElementById("modal-pw").focus(),100);
-    }
+// ── 기타 ──────────────────────────────────────────────
+window.onReset = function(){
+  if(phase!=='idle') return;
+  if(role==='host') set(ref(db,DB_PATH),null);
+  else { assigned=emptyAssigned(); renderAll(); }
+};
 
-    // ─── SVG ──────────────────────────────────────
-    const NS="http://www.w3.org/2000/svg";
-    function svgEl(tag,attrs){
-      const e=document.createElementNS(NS,tag);
-      for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);
-      return e;
-    }
-    function svgToScreen(svgX,svgY){
-      const s=document.getElementById("map-svg");
-      if(!s)return{x:0,y:0};
-      const pt=s.createSVGPoint();pt.x=svgX;pt.y=svgY;
-      const m=pt.matrixTransform(s.getScreenCTM());
-      return{x:m.x,y:m.y};
-    }
+window.onLockClick = function(){
+  if(role!=='host') return;
+  showModal();
+};
 
-    function renderChair(seat,name){
-      const taken=!!name, isLeader=taken&&LEADERS.includes(name);
-      const fill  =taken?(isLeader?"#5E5CE6":"#2DD4BF"):"rgba(255,255,255,0.07)";
-      const stroke=taken?(isLeader?"#8C8AF5":"#5EEAD4"):"rgba(255,255,255,0.14)";
-      const filt  =taken?(isLeader?"url(#glowPurple)":"url(#glowMint)"):null;
-      const g=svgEl("g",{transform:`translate(${seat.cx},${seat.cy}) rotate(${seat.dir})`});
-      const attrs={fill,stroke,"stroke-width":"1",...(filt?{filter:filt}:{})};
-      g.appendChild(svgEl("rect",{x:-CR+3,y:CR-3,width:(CR-3)*2,height:6,rx:3,...attrs}));
-      g.appendChild(svgEl("rect",{x:-CR,y:-CR,width:CR*2,height:CR*2,rx:5,...attrs,"stroke-width":"1.5"}));
-      if(taken){
-        const t=svgEl("text",{transform:`rotate(${-seat.dir})`,"text-anchor":"middle","dominant-baseline":"middle","font-size":name.length>3?6.5:8,"font-weight":800,fill:isLeader?"#fff":"#00201C","font-family":"-apple-system,sans-serif",style:"pointer-events:none;user-select:none"});
-        t.textContent=name; g.appendChild(t);
-      }
-      return g;
-    }
+function showModal(){
+  document.getElementById('modal-pw').value='';
+  document.getElementById('modal-error').style.display='none';
+  document.getElementById('modal-overlay').style.display='flex';
+  setTimeout(()=>document.getElementById('modal-pw').focus(),100);
+}
 
-    function renderSVG(){
-      const svg=document.getElementById("map-svg");
-      if(!svg || svg.clientWidth===0) return;
-      let g=document.getElementById("tables-group");
-      if(g)g.remove();
-      g=svgEl("g",{id:"tables-group"});
-      TABLES.forEach(table=>{
-        const{x,y,w,h,label,seats}=table,rx=10,tg=svgEl("g");
-        tg.appendChild(svgEl("rect",{x:x-w/2-6,y:y-h/2-6,width:w+12,height:h+12,rx:rx+6,fill:"none",stroke:"rgba(94,92,230,0.35)","stroke-width":8,opacity:0.4,filter:"url(#glowPurpleSoft)"}));
-        tg.appendChild(svgEl("rect",{x:x-w/2,y:y-h/2,width:w,height:h,rx,fill:"rgba(30,28,70,0.90)",stroke:"rgba(94,92,230,0.55)","stroke-width":1.5}));
-        tg.appendChild(svgEl("rect",{x:x-w/2+2,y:y-h/2+2,width:w-4,height:h/2-4,rx:rx-2,fill:"rgba(255,255,255,0.04)"}));
-        const lt=svgEl("text",{x,y:y+1,"text-anchor":"middle","dominant-baseline":"middle","font-size":12,"font-weight":700,fill:"rgba(255,255,255,0.55)","font-family":"-apple-system,sans-serif","letter-spacing":1,style:"pointer-events:none;user-select:none"});
-        lt.textContent=label; tg.appendChild(lt);
-        seats.forEach(s=>tg.appendChild(renderChair({...s,cx:x+s.dx,cy:y+s.dy},assigned[s.id])));
-        g.appendChild(tg);
-      });
-      svg.appendChild(g);
-    }
+window.submitModalPw = function(){
+  const val=document.getElementById('modal-pw').value;
+  if(val===PW_HOST){
+    document.getElementById('modal-overlay').style.display='none';
+    document.getElementById('modal-pw').value='';
+    if(pendingDraw==='lock'||pendingDraw===null){ locked=false; renderAll(); pendingDraw=null; }
+    else { const d=pendingDraw; pendingDraw=null; doExecuteDraw(d); }
+  } else {
+    document.getElementById('modal-error').style.display='block';
+    document.getElementById('modal-pw').classList.add('error');
+    document.getElementById('modal-pw').value='';
+    setTimeout(()=>{document.getElementById('modal-error').style.display='none';document.getElementById('modal-pw').classList.remove('error');},2000);
+  }
+};
+document.getElementById('modal-pw').addEventListener('keydown',e=>{if(e.key==='Enter')window.submitModalPw();});
+document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('modal-overlay'))document.getElementById('modal-overlay').style.display='none';});
 
-    function renderRoster(){
-      const lDone=LEADERS.filter(n=>Object.values(assigned).includes(n)).length;
-      const mDone=MEMBERS.filter(n=>Object.values(assigned).includes(n)).length;
-      document.getElementById("badge-leaders").textContent=`👑 ${lDone}/${LEADERS.length}`;
-      document.getElementById("badge-members").textContent=`★ ${mDone}/${MEMBERS.length}`;
-      const body=document.getElementById("roster-body");
-      if(!rosterOpen){body.style.display="none";return;}
-      body.style.display="block";
-      const lw=document.getElementById("roster-leaders"); lw.innerHTML="";
-      LEADERS.forEach(name=>{
-        const seat=Object.keys(assigned).find(k=>assigned[k]===name)||null;
-        const d=document.createElement("div");
-        d.className="name-chip leader-chip"+(seat?" taken":"");
-        d.innerHTML=name+(seat?`<span class="seat-label">${seat}</span>`:"");
-        lw.appendChild(d);
-      });
-      const mw=document.getElementById("roster-members"); mw.innerHTML="";
-      MEMBERS.forEach(name=>{
-        const seat=Object.keys(assigned).find(k=>assigned[k]===name)||null;
-        const d=document.createElement("div");
-        d.className="name-chip member-chip"+(seat?" taken":"");
-        d.innerHTML=name+(seat?`<span class="seat-label">${seat}</span>`:"");
-        mw.appendChild(d);
-      });
-    }
+window.toggleRoster = function(){
+  rosterOpen=!rosterOpen;
+  document.getElementById('roster-toggle').classList.toggle('open',rosterOpen);
+  document.getElementById('roster-chevron').style.transform=rosterOpen?'rotate(180deg)':'none';
+  const body=document.getElementById('roster-body');
+  body.style.display=rosterOpen?'block':'none';
+  if(rosterOpen) renderRoster();
+};
 
-    function renderButtons(){
-      const lDone=LEADERS.filter(n=>Object.values(assigned).includes(n)).length;
-      const mDone=MEMBERS.filter(n=>Object.values(assigned).includes(n)).length;
-      document.getElementById("leader-count").textContent=`${lDone}/8명 완료`;
-      document.getElementById("member-count").textContent=`${mDone}/23명 완료`;
-      document.getElementById("lock-icon").textContent=locked?"🔒":"🔓";
-      document.getElementById("lock-badge").textContent=locked?"잠금":"해제";
-      document.getElementById("lock-text").innerHTML=locked
-        ?`<div class="marquee-wrap"><span class="marquee-inner">지금은 연습게임 ! 연습게임 ! 연습게임 ! 입니다 아래 보라색 민트색 버튼 등등 아무거나 눌러보세요 근데 이 버튼을 누르고 비밀번호를 누르면 진짜 찐 최종 확정입니다 근데 비밀번호는 조영서만 알아요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;지금은 연습게임 ! 연습게임 ! 연습게임 ! 입니다 아래 보라색 민트색 버튼 등등 아무거나 눌러보세요 근데 이 버튼을 누르고 비밀번호를 누르면 진짜 찐 최종 확정입니다 근데 비밀번호는 조영서만 알아요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>`
-        :`<span class="lock-confirmed">✅ 진짜 최종 확정</span>`;
-      const busy=phase!=="idle";
-      if(role==="host"){
-        document.getElementById("btn-leaders").disabled=busy;
-        document.getElementById("btn-members").disabled=busy;
-        document.getElementById("btn-reset").disabled=busy;
-      }
-    }
-
-    function renderAll(){ renderSVG(); renderRoster(); renderButtons(); }
-
-    // ─── 뽑기 ─────────────────────────────────────
-    function doExecuteDraw(isLeader){
-      if(phase!=="idle")return;
-      phase="animating"; renderButtons();
-      const list=isLeader?LEADERS:MEMBERS;
-      const base={...assigned};
-      Object.keys(base).forEach(k=>{if(list.includes(base[k]))base[k]=null;});
-      let resultMap={};
-      if(isLeader){
-        const sL=shuffle(LEADERS),sT=shuffle(TABLES);
-        sT.forEach((t,i)=>{const seats=shuffle(t.seats);resultMap[seats[0].id]=sL[i];});
-      } else {
-        const empty=ALL_SEATS.filter(s=>!base[s.id]);
-        const sS=shuffle(empty),sM=shuffle(MEMBERS);
-        sM.forEach((n,i)=>{if(i<sS.length)resultMap[sS[i].id]=n;});
-      }
-      const btnEl=document.getElementById(isLeader?"btn-leaders":"btn-members");
-      const btnR=btnEl.getBoundingClientRect();
-      const ox=btnR.left+btnR.width/2-24, oy=btnR.top+btnR.height/2-12;
-      const delays=Object.entries(resultMap).map(([seatId,name],i)=>{
-        const si=ALL_SEATS.find(s=>s.id===seatId);
-        let ex=ox,ey=oy;
-        if(si){const sc=svgToScreen(si.cx,si.cy);ex=sc.x-24;ey=sc.y-12;}
-        const delay=i*(isLeader?0.045:0.028);
-        launchChip(name,LEADERS.includes(name),ox,oy,ex,ey,delay);
-        return delay;
-      });
-      const maxDelay=((delays.length>0?Math.max(...delays):0)+0.8)*1000;
-      setTimeout(()=>{
-        const next={...base,...resultMap};
-        if(role==="host") set(ref(db,DB_PATH),next);
-        else { assigned=next; }
-        phase="idle";
-      },maxDelay);
-    }
-
-    function launchChip(name,isLeader,sx,sy,ex,ey,delay){
-      const c=document.createElement("div");
-      c.className="floating-chip "+(isLeader?"chip-leader":"chip-member");
-      c.textContent=name; c.style.left=sx+"px"; c.style.top=sy+"px";
-      document.body.appendChild(c);
-      setTimeout(()=>{
-        c.style.transition="left 0.6s cubic-bezier(0.22,1,0.36,1),top 0.6s cubic-bezier(0.22,1,0.36,1),opacity 0.15s ease 0.48s,transform 0.6s ease";
-        c.style.left=ex+"px"; c.style.top=ey+"px"; c.style.opacity="0"; c.style.transform="scale(0.6)";
-      },delay*1000+30);
-      setTimeout(()=>c.remove(),(delay+0.8)*1000);
-    }
-
-  </script>
+window.onLockClick = function(){
+  if(role!=='host') return;
+  pendingDraw='lock';
+  showModal();
+};
+</script>
 </body>
 </html>
