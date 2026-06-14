@@ -144,7 +144,7 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
   <div id="role-bar"></div>
   <header>
     <div class="header-sub">양고기 먹으러 가기 전에</div>
-    <div class="header-title">🌸🤤🍀 자리를 뽑아볼게요 🥵✨🥑</div>
+    <div class="header-title" id="header-title">🌸🤤🍀 자리를 뽑아볼게요 🥵✨🥑</div>
   </header>
 
   <!-- 뽑기 비번 모달 -->
@@ -160,14 +160,12 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
   </div>
 
   <div class="controls">
-    <!-- 황금 잠금 버튼 -->
-    <button id="btn-lock" onclick="onLockClick()">
-      <span id="lock-icon">🔒</span>
-      <div id="lock-text">
-        <div class="marquee-wrap"><span class="marquee-inner">지금은 연습게임 ! 연습게임 ! 연습게임 ! 입니다 아래 보라색 민트색 버튼 등등 아무거나 눌러보세요 근데 이 버튼을 누르고 비밀번호를 누르면 진짜 찐 최종 확정입니다 근데 비밀번호는 조영서만 알아요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;지금은 연습게임 ! 연습게임 ! 연습게임 ! 입니다 아래 보라색 민트색 버튼 등등 아무거나 눌러보세요 근데 이 버튼을 누르고 비밀번호를 누르면 진짜 찐 최종 확정입니다 근데 비밀번호는 조영서만 알아요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
-      </div>
-      <span id="lock-badge">잠금</span>
-    </button>
+    <!-- 황금 안내 박스 (viewer/host만 표시, host가 Firebase로 텍스트 제어) -->
+    <div id="announce-box" style="display:none;width:100%;margin-bottom:10px;padding:16px;border-radius:16px;border:1px solid rgba(245,166,35,0.45);background:linear-gradient(135deg,rgba(245,166,35,0.16),rgba(245,130,10,0.08));backdrop-filter:blur(24px);box-shadow:0 0 0 1px rgba(245,166,35,0.08),0 2px 16px rgba(245,166,35,0.12);text-align:center;">
+      <span id="announce-text" style="font-size:18px;font-weight:800;color:#FFD580;letter-spacing:-0.3px;"></span>
+    </div>
+    <!-- 황금 잠금 버튼 (browse 전용 — 항상 숨김, 코드 호환용으로만 유지) -->
+    <button id="btn-lock" onclick="onLockClick()" style="display:none;"></button>
     <!-- 보라/민트 버튼 -->
     <div class="btn-row">
       <button id="btn-leaders" class="glass-btn" onclick="onDrawClick(true)">
@@ -335,7 +333,9 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
   </div>
 
   <div class="reset-wrap">
-    <button id="btn-reset" onclick="onReset()">초기화</button>
+    <button id="btn-practice" onclick="onAnnounce('연습게임')" style="display:none;padding:12px 20px;border-radius:14px;border:1px solid rgba(94,92,230,0.45);background:linear-gradient(135deg,rgba(94,92,230,0.18),rgba(94,92,230,0.08));backdrop-filter:blur(16px);color:#A8A6FF;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 16px rgba(94,92,230,0.15);">연습게임</button>
+    <button id="btn-reset" onclick="onReset()" style="margin:0 8px;">초기화</button>
+    <button id="btn-real" onclick="onAnnounce('이번엔 진짜')" style="display:none;padding:12px 20px;border-radius:14px;border:1px solid rgba(45,212,191,0.45);background:linear-gradient(135deg,rgba(45,212,191,0.18),rgba(45,212,191,0.08));backdrop-filter:blur(16px);color:#7FEEE5;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 16px rgba(45,212,191,0.15);">이번엔 진짜</button>
   </div>
 </div>
 
@@ -368,7 +368,7 @@ const TABLE_IDS = ["A","B","C","D","E","F","G","H"];
 function emptyAssigned(){const o={};ALL_SEAT_IDS.forEach(id=>{o[id]=null;});return o;}
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
-let role=null, assigned=emptyAssigned(), locked=true, phase="idle", pendingDraw=null, rosterOpen=false;
+let role=null, assigned=emptyAssigned(), locked=true, phase="idle", pendingDraw=null, rosterOpen=false, announceText='';
 
 // ── 의자 업데이트 (SVG 요소 직접 수정) ──────────────
 function updateChair(seatId, name){
@@ -399,22 +399,15 @@ function updateChair(seatId, name){
 }
 
 function renderAll(){
-  // 의자 전체 업데이트
   ALL_SEAT_IDS.forEach(id => updateChair(id, assigned[id]));
-  // 카운터
   const lDone=LEADERS.filter(n=>Object.values(assigned).includes(n)).length;
   const mDone=MEMBERS.filter(n=>Object.values(assigned).includes(n)).length;
   document.getElementById('leader-count').textContent=`${lDone}/8명 완료`;
   document.getElementById('member-count').textContent=`${mDone}/23명 완료`;
   document.getElementById('badge-leaders').textContent=`👑 ${lDone}/${LEADERS.length}`;
   document.getElementById('badge-members').textContent=`★ ${mDone}/${MEMBERS.length}`;
-  // 잠금 버튼
-  document.getElementById('lock-icon').textContent=locked?'🔒':'🔓';
-  document.getElementById('lock-badge').textContent=locked?'잠금':'해제';
-  document.getElementById('lock-text').innerHTML=locked
-    ?`<div class="marquee-wrap"><span class="marquee-inner">지금은 연습게임 ! 연습게임 ! 연습게임 ! 입니다 아래 보라색 민트색 버튼 등등 아무거나 눌러보세요 근데 이 버튼을 누르고 비밀번호를 누르면 진짜 찐 최종 확정입니다 근데 비밀번호는 조영서만 알아요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;지금은 연습게임 ! 연습게임 ! 연습게임 ! 입니다 아래 보라색 민트색 버튼 등등 아무거나 눌러보세요 근데 이 버튼을 누르고 비밀번호를 누르면 진짜 찐 최종 확정입니다 근데 비밀번호는 조영서만 알아요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>`
-    :`<span class="lock-confirmed">✅ 진짜 최종 확정</span>`;
-  // 명단 패널
+  // 황금 안내 박스 텍스트
+  document.getElementById('announce-text').textContent = announceText;
   if(rosterOpen) renderRoster();
 }
 
@@ -447,16 +440,29 @@ window.enterApp = function(r){
   else if(r==='viewer'){bar.className='bar-viewer';bar.innerHTML='<span>👀 참석자 모드</span><span class="role-badge role-viewer" style="margin-left:8px">명단 보기만 가능</span>';}
   else{bar.className='bar-browse';bar.innerHTML='<span>🔍 둘러보기 모드</span><span class="role-badge role-browse" style="margin-left:8px">실시간 공유 없음</span>';}
 
-  document.getElementById('btn-lock').style.display=(r==='browse')?'none':'flex';
-  document.getElementById('btn-leaders').disabled=(r==='viewer');
-  document.getElementById('btn-members').disabled=(r==='viewer');
-  document.getElementById('btn-reset').disabled=(r==='viewer');
+  // 헤더 타이틀 — browse만 다르게
+  document.getElementById('header-title').textContent =
+    r==='browse' ? '뽑기 방법을 구경해주세요' : '🌸🤤🍀 자리를 뽑아볼게요 🥵✨🥑';
 
-  renderAll(); // SVG는 이미 HTML에 있으므로 즉시 렌더 가능
+  // 황금 안내 박스 — viewer/host만 표시
+  document.getElementById('announce-box').style.display = (r==='browse') ? 'none' : 'block';
+
+  // 버튼 권한
+  document.getElementById('btn-leaders').disabled = (r==='viewer');
+  document.getElementById('btn-members').disabled = (r==='viewer');
+  document.getElementById('btn-reset').disabled   = (r==='viewer');
+
+  // host 전용 버튼 표시
+  document.getElementById('btn-practice').style.display = (r==='host') ? 'inline-block' : 'none';
+  document.getElementById('btn-real').style.display     = (r==='host') ? 'inline-block' : 'none';
+
+  renderAll();
 
   if(r==='host'||r==='viewer'){
     onValue(ref(db,DB_PATH),snap=>{
-      assigned=snap.val()??emptyAssigned();
+      const data=snap.val()??{};
+      assigned=data.seats??emptyAssigned();
+      announceText=data.announce??'';
       renderAll();
     });
   }
@@ -525,7 +531,7 @@ function doExecuteDraw(isLeader){
   const maxDelay=((delays.length>0?Math.max(...delays):0)+0.8)*1000;
   setTimeout(()=>{
     const next={...base,...resultMap};
-    if(role==='host'||role==='viewer') set(ref(db,DB_PATH),next);
+    if(role==='host'||role==='viewer') set(ref(db,DB_PATH),{seats:next,announce:announceText});
     else { assigned=next; renderAll(); }
     phase='idle';
     document.getElementById('btn-leaders').disabled=(role==='viewer');
@@ -549,8 +555,19 @@ function launchChip(name,isLeader,sx,sy,ex,ey,delay){
 // ── 기타 ──────────────────────────────────────────────
 window.onReset = function(){
   if(phase!=='idle') return;
-  if(role==='host') set(ref(db,DB_PATH),null);
-  else { assigned=emptyAssigned(); renderAll(); }
+  if(role==='host'){
+    announceText='';
+    set(ref(db,DB_PATH),{seats:null,announce:''});
+  } else {
+    assigned=emptyAssigned(); renderAll();
+  }
+};
+
+window.onAnnounce = function(text){
+  if(role!=='host') return;
+  announceText=text;
+  set(ref(db,DB_PATH),{seats:assigned,announce:text});
+  renderAll();
 };
 
 window.onLockClick = function(){
@@ -570,8 +587,7 @@ window.submitModalPw = function(){
   if(val===PW_HOST){
     document.getElementById('modal-overlay').style.display='none';
     document.getElementById('modal-pw').value='';
-    if(pendingDraw==='lock'||pendingDraw===null){ locked=false; renderAll(); pendingDraw=null; }
-    else { const d=pendingDraw; pendingDraw=null; doExecuteDraw(d); }
+    const d=pendingDraw; pendingDraw=null; doExecuteDraw(d);
   } else {
     document.getElementById('modal-error').style.display='block';
     document.getElementById('modal-pw').classList.add('error');
@@ -591,11 +607,7 @@ window.toggleRoster = function(){
   if(rosterOpen) renderRoster();
 };
 
-window.onLockClick = function(){
-  if(role!=='host') return;
-  pendingDraw='lock';
-  showModal();
-};
+window.onLockClick = function(){ /* 더 이상 사용 안 함 */ };
 </script>
 </body>
 </html>
