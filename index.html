@@ -355,6 +355,7 @@ const firebaseConfig = {
 const db = getDatabase(initializeApp(firebaseConfig));
 const DB_SEATS    = "seating-v1/seats";
 const DB_ANNOUNCE = "seating-v1/announce";
+const DB_EVENT    = "seating-v1/event";
 
 const LEADERS = ["정윤","두환","서연","길수","동관","지원","영균","지훈"];
 const MEMBERS = ["민주","해원","정환","보경","태명","영서","우석","제현","주경","찬희","창희","현진","후조","지혜","원희","해민","영또","민태","새한","정현","호현","지우","승하"];
@@ -470,12 +471,21 @@ window.enterApp = function(r){
     });
     onValue(ref(db,DB_ANNOUNCE),snap=>{
       announceText=snap.val()??'';
-      // viewer: 텍스트 없으면 박스 숨기기
       if(r==='viewer'){
         document.getElementById('announce-box').style.display = announceText ? 'block' : 'none';
       }
       document.getElementById('announce-text').textContent = announceText;
     });
+    // viewer: 진행자의 뽑기 이벤트 감지 → 애니메이션 실행
+    if(r==='viewer'){
+      let lastTs=0;
+      onValue(ref(db,DB_EVENT),snap=>{
+        const ev=snap.val();
+        if(!ev||ev.ts===lastTs) return; // 중복 방지
+        lastTs=ev.ts;
+        playAnimationForViewer(ev.resultMap, ev.isLeader);
+      });
+    }
   }
 };
 
@@ -541,13 +551,19 @@ function doExecuteDraw(isLeader){
   const maxDelay=((delays.length>0?Math.max(...delays):0)+0.8)*1000;
   setTimeout(()=>{
     const next={...base,...resultMap};
-    if(role==='host') set(ref(db,DB_SEATS),next);
-    else { assigned=next; renderAll(); }
+    if(role==='host'){
+      // 이벤트 먼저 저장 (viewer들이 감지해서 애니메이션 실행)
+      set(ref(db,DB_EVENT),{resultMap,isLeader,ts:Date.now()});
+      // 애니메이션 시간만큼 뒤에 실제 자리 반영
+      setTimeout(()=>set(ref(db,DB_SEATS),next), maxDelay);
+    } else {
+      assigned=next; renderAll();
+    }
     phase='idle';
     document.getElementById('btn-leaders').disabled=(role==='viewer');
     document.getElementById('btn-members').disabled=(role==='viewer');
     document.getElementById('btn-reset').disabled=(role==='viewer');
-  },maxDelay);
+  }, 0);
 }
 
 function launchChip(name,isLeader,sx,sy,ex,ey,delay){
@@ -560,6 +576,23 @@ function launchChip(name,isLeader,sx,sy,ex,ey,delay){
     c.style.left=ex+'px'; c.style.top=ey+'px'; c.style.opacity='0'; c.style.transform='scale(0.6)';
   },delay*1000+30);
   setTimeout(()=>c.remove(),(delay+0.8)*1000);
+}
+
+// viewer 전용 — Firebase 이벤트를 받아서 애니메이션 실행
+function playAnimationForViewer(resultMap, isLeader){
+  // 버튼 위치 대신 화면 중앙 상단을 출발점으로
+  const ox = window.innerWidth/2 - 24;
+  const oy = 120;
+  Object.entries(resultMap).forEach(([seatId,name],i)=>{
+    const chairEl=document.getElementById(seatId);
+    let ex=ox, ey=oy;
+    if(chairEl){
+      const r2=chairEl.getBoundingClientRect();
+      ex=r2.left+r2.width/2-24; ey=r2.top+r2.height/2-12;
+    }
+    const delay=i*(isLeader?0.045:0.028);
+    launchChip(name,LEADERS.includes(name),ox,oy,ex,ey,delay);
+  });
 }
 
 // ── 기타 ──────────────────────────────────────────────
