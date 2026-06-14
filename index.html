@@ -353,7 +353,8 @@ const firebaseConfig = {
   appId:"1:680754375350:web:e33d9a7f166dd7a0f85417",
 };
 const db = getDatabase(initializeApp(firebaseConfig));
-const DB_PATH = "seating-v1";
+const DB_SEATS    = "seating-v1/seats";
+const DB_ANNOUNCE = "seating-v1/announce";
 
 const LEADERS = ["정윤","두환","서연","길수","동관","지원","영균","지훈"];
 const MEMBERS = ["민주","해원","정환","보경","태명","이영","우석","제현","주경","찬희","창희","현진","후조","지혜","원희","해민","조영","민태","새한","정현","호현","지우","승하"];
@@ -406,8 +407,7 @@ function renderAll(){
   document.getElementById('member-count').textContent=`${mDone}/23명 완료`;
   document.getElementById('badge-leaders').textContent=`👑 ${lDone}/${LEADERS.length}`;
   document.getElementById('badge-members').textContent=`★ ${mDone}/${MEMBERS.length}`;
-  // 황금 안내 박스 텍스트
-  document.getElementById('announce-text').textContent = announceText;
+  document.getElementById('announce-text').textContent=announceText;
   if(rosterOpen) renderRoster();
 }
 
@@ -444,8 +444,13 @@ window.enterApp = function(r){
   document.getElementById('header-title').textContent =
     r==='browse' ? '뽑기 방법을 구경해주세요' : '🌸🤤🍀 자리를 뽑아볼게요 🥵✨🥑';
 
-  // 황금 안내 박스 — viewer/host만 표시
-  document.getElementById('announce-box').style.display = (r==='browse') ? 'none' : 'block';
+  // 황금 안내 박스 — host만 항상 표시, viewer는 텍스트가 있을 때만 표시
+  // (browse는 숨김)
+  if(r==='browse'){
+    document.getElementById('announce-box').style.display='none';
+  } else {
+    document.getElementById('announce-box').style.display='block';
+  }
 
   // 버튼 권한
   document.getElementById('btn-leaders').disabled = (r==='viewer');
@@ -459,11 +464,17 @@ window.enterApp = function(r){
   renderAll();
 
   if(r==='host'||r==='viewer'){
-    onValue(ref(db,DB_PATH),snap=>{
-      const data=snap.val()??{};
-      assigned=data.seats??emptyAssigned();
-      announceText=data.announce??'';
+    onValue(ref(db,DB_SEATS),snap=>{
+      assigned=snap.val()??emptyAssigned();
       renderAll();
+    });
+    onValue(ref(db,DB_ANNOUNCE),snap=>{
+      announceText=snap.val()??'';
+      // viewer: 텍스트 없으면 박스 숨기기
+      if(r==='viewer'){
+        document.getElementById('announce-box').style.display = announceText ? 'block' : 'none';
+      }
+      document.getElementById('announce-text').textContent = announceText;
     });
   }
 };
@@ -484,8 +495,7 @@ document.getElementById('entry-pw').addEventListener('keydown',e=>{if(e.key==='E
 // ── 뽑기 ─────────────────────────────────────────────
 window.onDrawClick = function(isLeader){
   if(phase!=='idle') return;
-  if(!locked){ pendingDraw=isLeader; showModal(); }
-  else doExecuteDraw(isLeader);
+  doExecuteDraw(isLeader);
 };
 
 function doExecuteDraw(isLeader){
@@ -531,7 +541,7 @@ function doExecuteDraw(isLeader){
   const maxDelay=((delays.length>0?Math.max(...delays):0)+0.8)*1000;
   setTimeout(()=>{
     const next={...base,...resultMap};
-    if(role==='host'||role==='viewer') set(ref(db,DB_PATH),{seats:next,announce:announceText});
+    if(role==='host') set(ref(db,DB_SEATS),next);
     else { assigned=next; renderAll(); }
     phase='idle';
     document.getElementById('btn-leaders').disabled=(role==='viewer');
@@ -556,8 +566,8 @@ function launchChip(name,isLeader,sx,sy,ex,ey,delay){
 window.onReset = function(){
   if(phase!=='idle') return;
   if(role==='host'){
-    announceText='';
-    set(ref(db,DB_PATH),{seats:null,announce:''});
+    set(ref(db,DB_SEATS),null);
+    // announce는 유지 (초기화해도 안내문구는 그대로)
   } else {
     assigned=emptyAssigned(); renderAll();
   }
@@ -566,8 +576,8 @@ window.onReset = function(){
 window.onAnnounce = function(text){
   if(role!=='host') return;
   announceText=text;
-  set(ref(db,DB_PATH),{seats:assigned,announce:text});
-  renderAll();
+  set(ref(db,DB_ANNOUNCE),text);
+  document.getElementById('announce-text').textContent=text;
 };
 
 window.onLockClick = function(){
