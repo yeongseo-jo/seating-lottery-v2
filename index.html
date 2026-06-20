@@ -74,6 +74,14 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
 #real-popup-box .real-line2{font-size:20px;font-weight:800;color:#FFD1D1;letter-spacing:-0.2px;}
 @keyframes realPopIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
 
+/* 황금 안내 박스 — 기본(연습게임 등) / 빨간(이번엔 진짜) */
+#announce-box{width:100%;margin-bottom:10px;padding:16px;border-radius:16px;backdrop-filter:blur(24px);text-align:center;transition:all .25s ease;}
+#announce-box.gold{border:1px solid rgba(245,166,35,0.45);background:linear-gradient(135deg,rgba(245,166,35,0.16),rgba(245,130,10,0.08));box-shadow:0 0 0 1px rgba(245,166,35,0.08),0 2px 16px rgba(245,166,35,0.12);}
+#announce-box.red{border:1px solid rgba(255,69,69,0.55);background:linear-gradient(135deg,rgba(255,69,69,0.22),rgba(200,20,20,0.12));box-shadow:0 0 0 1px rgba(255,69,69,0.1),0 2px 18px rgba(255,69,69,0.18);}
+#announce-text{font-size:18px;font-weight:800;letter-spacing:-0.3px;}
+#announce-box.gold #announce-text{color:#FFD580;}
+#announce-box.red #announce-text{color:#FFD1D1;}
+
 /* 명단 패널 */
 .roster-wrap{margin-bottom:14px}
 #roster-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-radius:16px;border:1px solid rgba(245,166,35,.38);background:linear-gradient(135deg,rgba(245,166,35,.16),rgba(245,130,10,.08));backdrop-filter:blur(24px);box-shadow:0 0 0 1px rgba(245,166,35,.08),0 2px 16px rgba(245,166,35,.10);cursor:pointer;font-family:inherit;transition:all .22s ease}
@@ -181,8 +189,8 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
 
   <div class="controls">
     <!-- 황금 안내 박스 (viewer/host만 표시, host가 Firebase로 텍스트 제어) -->
-    <div id="announce-box" style="display:none;width:100%;margin-bottom:10px;padding:16px;border-radius:16px;border:1px solid rgba(245,166,35,0.45);background:linear-gradient(135deg,rgba(245,166,35,0.16),rgba(245,130,10,0.08));backdrop-filter:blur(24px);box-shadow:0 0 0 1px rgba(245,166,35,0.08),0 2px 16px rgba(245,166,35,0.12);text-align:center;">
-      <span id="announce-text" style="font-size:18px;font-weight:800;color:#FFD580;letter-spacing:-0.3px;"></span>
+    <div id="announce-box" class="gold" style="display:none;">
+      <span id="announce-text"></span>
     </div>
     <!-- 황금 잠금 버튼 (browse 전용 — 항상 숨김, 코드 호환용으로만 유지) -->
     <button id="btn-lock" onclick="onLockClick()" style="display:none;"></button>
@@ -433,6 +441,15 @@ function updateChair(seatId, name){
   }
 }
 
+// 황금/빨간 안내 박스 텍스트+색상 동시 적용
+function setAnnounce(text){
+  const box=document.getElementById('announce-box');
+  const isReal = (text==='이번엔 진짜');
+  box.classList.toggle('red', isReal);
+  box.classList.toggle('gold', !isReal);
+  document.getElementById('announce-text').textContent = text;
+}
+
 function renderAll(){
   ALL_SEAT_IDS.forEach(id => updateChair(id, assigned[id]));
   const lDone=LEADERS.filter(n=>Object.values(assigned).includes(n)).length;
@@ -441,7 +458,7 @@ function renderAll(){
   document.getElementById('member-count').textContent=`${mDone}/23명 완료`;
   document.getElementById('badge-leaders').textContent=`👑 ${lDone}/${LEADERS.length}`;
   document.getElementById('badge-members').textContent=`★ ${mDone}/${MEMBERS.length}`;
-  document.getElementById('announce-text').textContent=announceText;
+  setAnnounce(announceText);
   if(rosterOpen) renderRoster();
 }
 
@@ -507,7 +524,7 @@ window.enterApp = function(r){
       if(r==='viewer'){
         document.getElementById('announce-box').style.display = announceText ? 'block' : 'none';
       }
-      document.getElementById('announce-text').textContent = announceText;
+      setAnnounce(announceText);
     });
     // viewer: 진행자의 뽑기 이벤트 감지 → 애니메이션 실행
     if(r==='viewer'){
@@ -681,7 +698,7 @@ window.onAnnounce = function(text){
   if(role!=='host') return;
   announceText=text;
   set(ref(db,DB_ANNOUNCE),text);
-  document.getElementById('announce-text').textContent=text;
+  setAnnounce(text);
 };
 
 // '이번엔 진짜' 풀스크린 팝업 — host가 트리거, host/viewer 모두 표시
@@ -689,6 +706,10 @@ window.onTriggerRealPopup = function(){
   if(role!=='host') return;
   set(ref(db,DB_REALPOPUP),Date.now());
   showRealPopup(); // host 본인 화면에도 즉시 표시
+  // 안내 박스도 '이번엔 진짜'로 갱신 (자동으로 빨간 박스로 전환됨)
+  announceText='이번엔 진짜';
+  set(ref(db,DB_ANNOUNCE),'이번엔 진짜');
+  setAnnounce('이번엔 진짜');
 };
 
 let realPopupTimer=null;
