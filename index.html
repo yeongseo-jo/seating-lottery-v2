@@ -226,9 +226,9 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
         <text x="150" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="rgba(94,92,230,0.45)" letter-spacing="2" font-family="-apple-system,sans-serif">LEFT</text>
         <text x="450" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="rgba(94,92,230,0.45)" letter-spacing="2" font-family="-apple-system,sans-serif">RIGHT</text>
 
-        <!-- F, G 테이블을 감싸는 단차 표시 -->
-        <rect x="380" y="115" width="140" height="312" rx="14" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="3,5" opacity="0.9"/>
-        <text x="450" y="100" text-anchor="middle" font-size="15" font-weight="800" fill="#FFFFFF" letter-spacing="1.5" font-family="-apple-system,sans-serif">단차</text>
+        <!-- F, G 테이블과 의자를 모두 감싸는 단차 표시 -->
+        <rect x="375" y="86" width="150" height="368" rx="14" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="3,5" opacity="0.9"/>
+        <text x="450" y="68" text-anchor="middle" font-size="15" font-weight="800" fill="#FFFFFF" letter-spacing="1.5" font-family="-apple-system,sans-serif">단차</text>
 
         <!-- 창문 (왼쪽) -->
         <text x="30" y="420" text-anchor="middle" font-size="15" font-weight="800" fill="#FFFFFF" letter-spacing="1.5" font-family="-apple-system,sans-serif" transform="rotate(-90 30 420)">창문</text>
@@ -327,11 +327,17 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
           <g id="G4" transform="translate(470,434) rotate(0)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="G4-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(0)"></text></g>
         </g>
 
-        <!-- 테이블 H — 비워둠 (의자 없음) -->
+        <!-- 테이블 H — 비워둠 (의자 4개는 장식용, 배정되지 않음) -->
         <g id="tbl-H">
           <rect x="395" y="565" width="110" height="72" rx="16" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="6" opacity="0.5"/>
           <rect x="400" y="570" width="100" height="60" rx="10" fill="rgba(30,28,70,0.45)" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" stroke-dasharray="5,4"/>
           <text x="450" y="601" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="800" fill="#FFFFFF" font-family="-apple-system,sans-serif" letter-spacing="1">비우기</text>
+          <!-- 위쪽 의자 2개 (장식용, 배정 불가) -->
+          <g transform="translate(430,546) rotate(180)" opacity="0.35"><rect x="-12" y="12" width="24" height="6" rx="3" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.14)" stroke-width="1"/><rect x="-15" y="-15" width="30" height="30" rx="5" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.14)" stroke-width="1.5"/></g>
+          <g transform="translate(470,546) rotate(180)" opacity="0.35"><rect x="-12" y="12" width="24" height="6" rx="3" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.14)" stroke-width="1"/><rect x="-15" y="-15" width="30" height="30" rx="5" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.14)" stroke-width="1.5"/></g>
+          <!-- 아래쪽 의자 2개 (장식용, 배정 불가) -->
+          <g transform="translate(430,654) rotate(0)" opacity="0.35"><rect x="-12" y="12" width="24" height="6" rx="3" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.14)" stroke-width="1"/><rect x="-15" y="-15" width="30" height="30" rx="5" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.14)" stroke-width="1.5"/></g>
+          <g transform="translate(470,654) rotate(0)" opacity="0.35"><rect x="-12" y="12" width="24" height="6" rx="3" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.14)" stroke-width="1"/><rect x="-15" y="-15" width="30" height="30" rx="5" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.14)" stroke-width="1.5"/></g>
         </g>
       </svg>
     </div>
@@ -484,8 +490,15 @@ window.enterApp = function(r){
     // viewer: 진행자의 뽑기 이벤트 감지 → 애니메이션 실행
     if(r==='viewer'){
       let lastTs=0;
+      let firstLoad=true;
       onValue(ref(db,DB_EVENT),snap=>{
         const ev=snap.val();
+        if(firstLoad){
+          // 입장 시점에 이미 저장돼 있던 과거 이벤트는 재생하지 않음
+          firstLoad=false;
+          if(ev) lastTs=ev.ts;
+          return;
+        }
         if(!ev||ev.ts===lastTs) return; // 중복 방지
         lastTs=ev.ts;
         playAnimationForViewer(ev.resultMap, ev.isLeader);
