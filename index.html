@@ -169,7 +169,7 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
       <button id="btn-leaders" class="glass-btn" onclick="onDrawClick(true)">
         <span class="btn-icon">👑</span>1) 테이블장 앉히기
         <span class="btn-sub">여러분들과 친해지고 싶어요 .. ❣️</span>
-        <span class="btn-count" id="leader-count">0/8명 완료</span>
+        <span class="btn-count" id="leader-count">0/6명 완료</span>
       </button>
       <button id="btn-members" class="glass-btn" onclick="onDrawClick(false)">
         <span class="btn-icon">🎲</span>2) 사람들 앉히기
@@ -414,7 +414,7 @@ function renderAll(){
   ALL_SEAT_IDS.forEach(id => updateChair(id, assigned[id]));
   const lDone=LEADERS.filter(n=>Object.values(assigned).includes(n)).length;
   const mDone=MEMBERS.filter(n=>Object.values(assigned).includes(n)).length;
-  document.getElementById('leader-count').textContent=`${lDone}/8명 완료`;
+  document.getElementById('leader-count').textContent=`${lDone}/6명 완료`;
   document.getElementById('member-count').textContent=`${mDone}/23명 완료`;
   document.getElementById('badge-leaders').textContent=`👑 ${lDone}/${LEADERS.length}`;
   document.getElementById('badge-members').textContent=`★ ${mDone}/${MEMBERS.length}`;
