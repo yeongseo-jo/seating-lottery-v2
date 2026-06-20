@@ -543,6 +543,15 @@ window.onDrawClick = function(isLeader){
   doExecuteDraw(isLeader);
 };
 
+function showDebug(msg){
+  const d=document.createElement('div');
+  d.style.position='fixed';d.style.top='0';d.style.left='0';d.style.right='0';d.style.zIndex='99999';
+  d.style.background='#900';d.style.color='#fff';d.style.padding='10px';d.style.fontSize='12px';
+  d.style.whiteSpace='pre-wrap';d.style.maxHeight='40vh';d.style.overflow='auto';
+  d.textContent=msg;
+  document.body.appendChild(d);
+}
+
 function doExecuteDraw(isLeader){
   if(phase!=='idle') return;
   phase='animating';
@@ -585,19 +594,25 @@ function doExecuteDraw(isLeader){
 
   const maxDelay=((delays.length>0?Math.max(...delays):0)+0.8)*1000;
   setTimeout(()=>{
-    const next={...base,...resultMap};
-    if(role==='host'){
-      // 이벤트 먼저 저장 (viewer들이 감지해서 애니메이션 실행)
-      set(ref(db,DB_EVENT),{resultMap,isLeader,ts:Date.now()}).catch(err=>console.error('event write failed',err));
-      // 실제 자리 반영
-      set(ref(db,DB_SEATS),next).catch(err=>console.error('seats write failed',err));
-    } else {
-      assigned=next; renderAll();
+    try{
+      const next={...base,...resultMap};
+      if(role==='host'){
+        set(ref(db,DB_EVENT),{resultMap,isLeader,ts:Date.now()}).catch(err=>showDebug('event write failed: '+err.message));
+        set(ref(db,DB_SEATS),next).catch(err=>showDebug('seats write failed: '+err.message));
+      } else {
+        assigned=next; renderAll();
+      }
+      phase='idle';
+      document.getElementById('btn-leaders').disabled=(role==='viewer');
+      document.getElementById('btn-members').disabled=(role==='viewer');
+      document.getElementById('btn-reset').disabled=(role==='viewer');
+    } catch(err){
+      showDebug('doExecuteDraw 내부 에러: '+err.message+'\n'+err.stack);
+      phase='idle';
+      document.getElementById('btn-leaders').disabled=(role==='viewer');
+      document.getElementById('btn-members').disabled=(role==='viewer');
+      document.getElementById('btn-reset').disabled=(role==='viewer');
     }
-    phase='idle';
-    document.getElementById('btn-leaders').disabled=(role==='viewer');
-    document.getElementById('btn-members').disabled=(role==='viewer');
-    document.getElementById('btn-reset').disabled=(role==='viewer');
   }, maxDelay);
 }
 
