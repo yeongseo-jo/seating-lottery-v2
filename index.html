@@ -60,6 +60,20 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
 .btn-sub{display:block;font-size:11px;opacity:.78;margin-top:4px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
 .btn-count{display:block;font-size:11px;opacity:.6;margin-top:2px;font-weight:500}
 
+/* 풀스크린 '이번엔 진짜' 팝업 — 보라/민트 버튼과 동일한 스타일, 색만 빨간색 */
+#real-popup-overlay{display:none;position:fixed;inset:0;z-index:20000;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);}
+#real-popup-box{
+  width:100%;max-width:380px;padding:40px 28px;border-radius:24px;text-align:center;
+  border:1px solid rgba(255,69,69,.55);
+  background:linear-gradient(145deg,rgba(255,69,69,.28),rgba(200,20,20,.16));
+  backdrop-filter:blur(24px);
+  box-shadow:0 8px 40px rgba(255,69,69,.35),inset 0 1px 0 rgba(255,255,255,.1);
+  animation:realPopIn .35s cubic-bezier(.34,1.56,.64,1);
+}
+#real-popup-box .real-line1{font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:10px;}
+#real-popup-box .real-line2{font-size:20px;font-weight:800;color:#FFD1D1;letter-spacing:-0.2px;}
+@keyframes realPopIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+
 /* 명단 패널 */
 .roster-wrap{margin-bottom:14px}
 #roster-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-radius:16px;border:1px solid rgba(245,166,35,.38);background:linear-gradient(135deg,rgba(245,166,35,.16),rgba(245,130,10,.08));backdrop-filter:blur(24px);box-shadow:0 0 0 1px rgba(245,166,35,.08),0 2px 16px rgba(245,166,35,.10);cursor:pointer;font-family:inherit;transition:all .22s ease}
@@ -144,6 +158,14 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
     <div class="header-sub">양고기 먹으러 가기 전에</div>
     <div class="header-title" id="header-title">🌸🤤🍀 자리를 뽑아볼게요 🥵✨🥑</div>
   </header>
+
+  <!-- '이번엔 진짜' 풀스크린 팝업 -->
+  <div id="real-popup-overlay">
+    <div id="real-popup-box">
+      <div class="real-line1">이번엔 진짜 입니다 !!</div>
+      <div class="real-line2">낙장 불입 !!!</div>
+    </div>
+  </div>
 
   <!-- 뽑기 비번 모달 -->
   <div id="modal-overlay">
@@ -345,7 +367,7 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
   <div class="reset-wrap">
     <button id="btn-practice" onclick="onAnnounce('연습게임')" style="display:none;padding:12px 20px;border-radius:14px;border:1px solid rgba(94,92,230,0.45);background:linear-gradient(135deg,rgba(94,92,230,0.18),rgba(94,92,230,0.08));backdrop-filter:blur(16px);color:#A8A6FF;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 16px rgba(94,92,230,0.15);">연습게임</button>
     <button id="btn-reset" onclick="onReset()" style="margin:0 8px;">초기화</button>
-    <button id="btn-real" onclick="onAnnounce('이번엔 진짜')" style="display:none;padding:12px 20px;border-radius:14px;border:1px solid rgba(45,212,191,0.45);background:linear-gradient(135deg,rgba(45,212,191,0.18),rgba(45,212,191,0.08));backdrop-filter:blur(16px);color:#7FEEE5;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 16px rgba(45,212,191,0.15);">이번엔 진짜</button>
+    <button id="btn-real" onclick="onTriggerRealPopup()" style="display:none;padding:12px 20px;border-radius:14px;border:1px solid rgba(45,212,191,0.45);background:linear-gradient(135deg,rgba(45,212,191,0.18),rgba(45,212,191,0.08));backdrop-filter:blur(16px);color:#7FEEE5;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 16px rgba(45,212,191,0.15);">이번엔 진짜</button>
   </div>
 </div>
 
@@ -366,6 +388,7 @@ const db = getDatabase(initializeApp(firebaseConfig));
 const DB_SEATS    = "seating-v1/seats";
 const DB_ANNOUNCE = "seating-v1/announce";
 const DB_EVENT    = "seating-v1/event";
+const DB_REALPOPUP = "seating-v1/realpopup";
 
 const LEADERS = ["정윤","두환","서연","길수","동관","지원"];
 const MEMBERS = ["민주","해원","정환","보경","태명","영서","우석","제현","주경","찬희","창희","현진","후조","지혜","원희","해민","영또","민태","새한","정현","호현","지우","승하"];
@@ -501,6 +524,22 @@ window.enterApp = function(r){
         if(!ev||ev.ts===lastTs) return; // 중복 방지
         lastTs=ev.ts;
         playAnimationForViewer(ev.resultMap, ev.isLeader);
+      });
+    }
+    // host/viewer 공통: '이번엔 진짜' 풀스크린 팝업 이벤트 감지
+    {
+      let lastPopupTs=0;
+      let popupFirstLoad=true;
+      onValue(ref(db,DB_REALPOPUP),snap=>{
+        const ts=snap.val();
+        if(popupFirstLoad){
+          popupFirstLoad=false;
+          if(ts) lastPopupTs=ts;
+          return;
+        }
+        if(!ts||ts===lastPopupTs) return;
+        lastPopupTs=ts;
+        if(role!=='host') showRealPopup(); // host는 클릭 시 이미 본인 화면에 표시했으므로 중복 방지
       });
     }
   }
@@ -644,6 +683,21 @@ window.onAnnounce = function(text){
   set(ref(db,DB_ANNOUNCE),text);
   document.getElementById('announce-text').textContent=text;
 };
+
+// '이번엔 진짜' 풀스크린 팝업 — host가 트리거, host/viewer 모두 표시
+window.onTriggerRealPopup = function(){
+  if(role!=='host') return;
+  set(ref(db,DB_REALPOPUP),Date.now());
+  showRealPopup(); // host 본인 화면에도 즉시 표시
+};
+
+let realPopupTimer=null;
+function showRealPopup(){
+  const ov=document.getElementById('real-popup-overlay');
+  ov.style.display='flex';
+  if(realPopupTimer) clearTimeout(realPopupTimer);
+  realPopupTimer=setTimeout(()=>{ ov.style.display='none'; },3000);
+}
 
 window.onLockClick = function(){
   if(role!=='host') return;
