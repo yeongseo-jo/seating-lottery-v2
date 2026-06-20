@@ -350,6 +350,24 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
 </div>
 
 <script type="module">
+window.addEventListener('error', e=>{
+  const d=document.createElement('div');
+  d.style.position='fixed';d.style.top='0';d.style.left='0';d.style.right='0';d.style.zIndex='99999';
+  d.style.background='red';d.style.color='#fff';d.style.padding='10px';d.style.fontSize='12px';
+  d.style.whiteSpace='pre-wrap';d.style.maxHeight='40vh';d.style.overflow='auto';
+  d.textContent='JS 에러: '+e.message+' ('+e.filename+':'+e.lineno+')';
+  document.body.appendChild(d);
+});
+window.addEventListener('unhandledrejection', e=>{
+  const d=document.createElement('div');
+  d.style.position='fixed';d.style.top='0';d.style.left='0';d.style.right='0';d.style.zIndex='99999';
+  d.style.background='darkred';d.style.color='#fff';d.style.padding='10px';d.style.fontSize='12px';
+  d.style.whiteSpace='pre-wrap';d.style.maxHeight='40vh';d.style.overflow='auto';
+  d.textContent='Promise 에러: '+(e.reason&&e.reason.message?e.reason.message:e.reason);
+  document.body.appendChild(d);
+});
+</script>
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
