@@ -570,9 +570,9 @@ function doExecuteDraw(isLeader){
     const next={...base,...resultMap};
     if(role==='host'){
       // 이벤트 먼저 저장 (viewer들이 감지해서 애니메이션 실행)
-      set(ref(db,DB_EVENT),{resultMap,isLeader,ts:Date.now()});
-      // 애니메이션 시간만큼 뒤에 실제 자리 반영
-      setTimeout(()=>set(ref(db,DB_SEATS),next), maxDelay);
+      set(ref(db,DB_EVENT),{resultMap,isLeader,ts:Date.now()}).catch(err=>console.error('event write failed',err));
+      // 실제 자리 반영
+      set(ref(db,DB_SEATS),next).catch(err=>console.error('seats write failed',err));
     } else {
       assigned=next; renderAll();
     }
@@ -580,7 +580,7 @@ function doExecuteDraw(isLeader){
     document.getElementById('btn-leaders').disabled=(role==='viewer');
     document.getElementById('btn-members').disabled=(role==='viewer');
     document.getElementById('btn-reset').disabled=(role==='viewer');
-  }, 0);
+  }, maxDelay);
 }
 
 function launchChip(name,isLeader,sx,sy,ex,ey,delay){
