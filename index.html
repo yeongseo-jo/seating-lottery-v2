@@ -14,16 +14,16 @@ body{min-height:100vh;background:linear-gradient(160deg,#0D0D18 0%,#0A0A0F 50%,#
 /* 첫 화면 */
 #screen-entry{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:linear-gradient(160deg,#0D0D18 0%,#0A0A0F 50%,#080810 100%)}
 .entry-emoji{font-size:40px;margin-bottom:12px;text-align:center}
-.entry-sub{font-size:11px;font-weight:600;color:rgba(255,255,255,.38);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;text-align:center}
-.entry-title{font-size:20px;font-weight:700;text-align:center;margin-bottom:32px;letter-spacing:-.5px}
-.entry-card{width:100%;max-width:340px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:20px;padding:24px;backdrop-filter:blur(20px);margin-bottom:12px}
-.entry-card-title{font-size:13px;font-weight:700;margin-bottom:12px}
-.entry-pw-hint{font-size:11px;color:rgba(255,255,255,.3);text-align:center;margin-bottom:12px}
-.entry-pw-input{width:100%;padding:11px 14px;border-radius:12px;border:1px solid rgba(245,166,35,.3);background:rgba(255,255,255,.05);color:#fff;font-size:20px;text-align:center;letter-spacing:8px;outline:none;font-family:inherit;margin-bottom:8px}
+.entry-sub{font-size:14px;font-weight:600;color:rgba(255,255,255,.42);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;text-align:center}
+.entry-title{font-size:36px;font-weight:800;text-align:center;margin-bottom:40px;letter-spacing:-.5px}
+.entry-card{width:100%;max-width:340px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:20px;padding:26px;backdrop-filter:blur(20px);margin-bottom:12px}
+.entry-card-title{font-size:15px;font-weight:700;margin-bottom:14px}
+.entry-pw-hint{font-size:13px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:14px}
+.entry-pw-input{width:100%;padding:13px 14px;border-radius:12px;border:1px solid rgba(245,166,35,.3);background:rgba(255,255,255,.05);color:#fff;font-size:22px;text-align:center;letter-spacing:8px;outline:none;font-family:inherit;margin-bottom:8px}
 .entry-pw-input.error{border-color:rgba(255,80,80,.6)}
-.entry-error{font-size:12px;color:rgba(255,100,100,.9);text-align:center;margin-bottom:8px;display:none}
-.btn-entry-pw{width:100%;padding:13px;border-radius:12px;border:1px solid rgba(245,166,35,.45);background:linear-gradient(135deg,rgba(245,166,35,.22),rgba(245,130,10,.12));color:#FFD580;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
-.btn-entry-browse{width:100%;max-width:340px;padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);backdrop-filter:blur(20px);color:rgba(255,255,255,.55);font-weight:600;font-size:14px;cursor:pointer;font-family:inherit}
+.entry-error{font-size:13px;color:rgba(255,100,100,.9);text-align:center;margin-bottom:8px;display:none}
+.btn-entry-pw{width:100%;padding:15px;border-radius:12px;border:1px solid rgba(245,166,35,.45);background:linear-gradient(135deg,rgba(245,166,35,.22),rgba(245,130,10,.12));color:#FFD580;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.btn-entry-browse{width:100%;max-width:340px;padding:16px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);backdrop-filter:blur(20px);color:rgba(255,255,255,.6);font-weight:600;font-size:15px;cursor:pointer;font-family:inherit}
 .role-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
 .role-viewer{background:rgba(245,166,35,.2);color:#FFD580;border:1px solid rgba(245,166,35,.4)}
 .role-host{background:rgba(94,92,230,.25);color:#A8A6FF;border:1px solid rgba(94,92,230,.5)}
@@ -57,7 +57,7 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
 #btn-leaders{border:1px solid rgba(94,92,230,.5);background:linear-gradient(145deg,rgba(94,92,230,.22),rgba(94,92,230,.10));backdrop-filter:blur(20px);box-shadow:0 4px 24px rgba(94,92,230,.25),inset 0 1px 0 rgba(255,255,255,.08)}
 #btn-members{border:1px solid rgba(45,212,191,.4);background:linear-gradient(145deg,rgba(45,212,191,.18),rgba(45,212,191,.08));backdrop-filter:blur(20px);box-shadow:0 4px 24px rgba(45,212,191,.2),inset 0 1px 0 rgba(255,255,255,.08)}
 .btn-icon{font-size:18px;display:block;margin-bottom:2px}
-.btn-sub{display:block;font-size:6.5px;opacity:.35;margin-top:4px;font-weight:400}
+.btn-sub{display:block;font-size:11px;opacity:.78;margin-top:4px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
 .btn-count{display:block;font-size:11px;opacity:.6;margin-top:2px;font-weight:500}
 
 /* 명단 패널 */
@@ -126,17 +126,16 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
 
 <!-- 첫 화면 -->
 <div id="screen-entry">
-  <div class="entry-emoji">🌸🤤🍀</div>
-  <div class="entry-sub">양고기 먹으러 가기 전에</div>
-  <div class="entry-title">자리를 뽑아볼게요 🥵✨🥑</div>
+  <div class="entry-sub">by YDD</div>
+  <div class="entry-title">랜덤으로 자리 뽑기</div>
   <div class="entry-card">
-    <div class="entry-card-title">🔐 비밀번호로 입장</div>
-    <div class="entry-pw-hint">비밀번호를 입력하세요</div>
+    <div class="entry-card-title">입장코드로 입장</div>
+    <div class="entry-pw-hint">입장코드를 입력하세요</div>
     <input id="entry-pw" class="entry-pw-input" type="password" placeholder="••••••" maxlength="6"/>
-    <div id="entry-error" class="entry-error">틀렸어요 😅</div>
+    <div id="entry-error" class="entry-error">틀렸어요</div>
     <button class="btn-entry-pw" onclick="submitEntryPw()">입장하기</button>
   </div>
-  <button class="btn-entry-browse" onclick="enterApp('browse')">👀 &nbsp;앱 둘러보기 (실시간 공유 없음)</button>
+  <button class="btn-entry-browse" onclick="enterApp('browse')">앱 둘러보기 (실시간 공유 없음)</button>
 </div>
 
 <!-- 메인 앱 -->
@@ -151,9 +150,9 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
   <div id="modal-overlay">
     <div class="modal-box">
       <div class="modal-emoji">🔐</div>
-      <div class="modal-title">비밀번호 확인</div>
-      <div class="modal-sub">진행자 비밀번호를 입력하세요</div>
-      <input id="modal-pw" class="modal-pw-input" type="password" placeholder="비밀번호"/>
+      <div class="modal-title">입장코드 확인</div>
+      <div class="modal-sub">진행자 입장코드를 입력하세요</div>
+      <input id="modal-pw" class="modal-pw-input" type="password" placeholder="입장코드"/>
       <div id="modal-error" class="modal-error">틀렸어요 😅</div>
       <button class="modal-confirm" onclick="submitModalPw()">확인</button>
     </div>
@@ -226,8 +225,17 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
         <line x1="300" y1="20" x2="300" y2="800" stroke="rgba(94,92,230,0.12)" stroke-width="1" stroke-dasharray="6,10"/>
         <text x="150" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="rgba(94,92,230,0.45)" letter-spacing="2" font-family="-apple-system,sans-serif">LEFT</text>
         <text x="450" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="rgba(94,92,230,0.45)" letter-spacing="2" font-family="-apple-system,sans-serif">RIGHT</text>
-        <text x="300" y="813" text-anchor="middle" font-size="10" font-weight="600" fill="rgba(255,255,255,0.2)" letter-spacing="1.5" font-family="-apple-system,sans-serif">ENTRANCE</text>
-        <line x1="260" y1="808" x2="340" y2="808" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+
+        <!-- F, G 테이블을 감싸는 단차 표시 -->
+        <rect x="380" y="115" width="140" height="312" rx="14" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="3,5" opacity="0.9"/>
+        <text x="450" y="100" text-anchor="middle" font-size="15" font-weight="800" fill="#FFFFFF" letter-spacing="1.5" font-family="-apple-system,sans-serif">단차</text>
+
+        <!-- 창문 (왼쪽) -->
+        <text x="30" y="420" text-anchor="middle" font-size="15" font-weight="800" fill="#FFFFFF" letter-spacing="1.5" font-family="-apple-system,sans-serif" transform="rotate(-90 30 420)">창문</text>
+
+        <!-- 출입구 -->
+        <text x="300" y="800" text-anchor="middle" font-size="15" font-weight="800" fill="#FFFFFF" letter-spacing="1.5" font-family="-apple-system,sans-serif">출입구</text>
+        <line x1="255" y1="793" x2="345" y2="793" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
 
         <!-- 테이블 A (x=150, y=100) 좌우 의자 -->
         <g id="tbl-A">
@@ -279,9 +287,9 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
           <g id="D4" transform="translate(235,508) rotate(270)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="D4-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-270)"></text></g>
         </g>
 
-        <!-- 테이블 E (x=150, y=620) -->
+        <!-- 테이블 E (x=150, y=620) — 입구쪽에 의자 1개 추가(E5), 총 5석 -->
         <g id="tbl-E">
-          <rect x="95" y="590" width="110" height="72" rx="16" fill="none" stroke="rgba(94,92,230,0.35)" stroke-width="8" opacity="0.4" filter="url(#glowPurpleSoft)"/>
+          <rect x="95" y="590" width="110" height="92" rx="16" fill="none" stroke="rgba(94,92,230,0.35)" stroke-width="8" opacity="0.4" filter="url(#glowPurpleSoft)"/>
           <rect x="100" y="590" width="100" height="60" rx="10" fill="rgba(30,28,70,0.90)" stroke="rgba(94,92,230,0.55)" stroke-width="1.5"/>
           <rect x="102" y="592" width="96" height="28" rx="8" fill="rgba(255,255,255,0.04)"/>
           <text x="150" y="621" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="-apple-system,sans-serif" letter-spacing="1">E</text>
@@ -289,6 +297,8 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
           <g id="E2" transform="translate(65,638) rotate(90)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="E2-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90)"></text></g>
           <g id="E3" transform="translate(235,602) rotate(270)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="E3-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-270)"></text></g>
           <g id="E4" transform="translate(235,638) rotate(270)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="E4-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-270)"></text></g>
+          <!-- 입구쪽(아래) 의자 5번째 -->
+          <g id="E5" transform="translate(150,665) rotate(0)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="E5-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(0)"></text></g>
         </g>
 
         <!-- 테이블 F (x=450, y=160) 상하 의자 -->
@@ -317,16 +327,11 @@ header{width:100%;background:rgba(255,255,255,.03);backdrop-filter:blur(30px);bo
           <g id="G4" transform="translate(470,434) rotate(0)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="G4-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(0)"></text></g>
         </g>
 
-        <!-- 테이블 H (x=450, y=600) -->
+        <!-- 테이블 H — 비워둠 (의자 없음) -->
         <g id="tbl-H">
-          <rect x="395" y="565" width="110" height="72" rx="16" fill="none" stroke="rgba(94,92,230,0.35)" stroke-width="8" opacity="0.4" filter="url(#glowPurpleSoft)"/>
-          <rect x="400" y="570" width="100" height="60" rx="10" fill="rgba(30,28,70,0.90)" stroke="rgba(94,92,230,0.55)" stroke-width="1.5"/>
-          <rect x="402" y="572" width="96" height="28" rx="8" fill="rgba(255,255,255,0.04)"/>
-          <text x="450" y="601" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="-apple-system,sans-serif" letter-spacing="1">H</text>
-          <g id="H1" transform="translate(430,546) rotate(180)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="H1-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-180)"></text></g>
-          <g id="H2" transform="translate(470,546) rotate(180)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="H2-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(-180)"></text></g>
-          <g id="H3" transform="translate(430,654) rotate(0)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="H3-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(0)"></text></g>
-          <g id="H4" transform="translate(470,654) rotate(0)"><rect class="chair-back" x="-12" y="12" width="24" height="6" rx="3"/><rect class="chair-seat" x="-15" y="-15" width="30" height="30" rx="5"/><text class="chair-name" id="H4-name" text-anchor="middle" dominant-baseline="middle" transform="rotate(0)"></text></g>
+          <rect x="395" y="565" width="110" height="72" rx="16" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="6" opacity="0.5"/>
+          <rect x="400" y="570" width="100" height="60" rx="10" fill="rgba(30,28,70,0.45)" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" stroke-dasharray="5,4"/>
+          <text x="450" y="601" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="800" fill="#FFFFFF" font-family="-apple-system,sans-serif" letter-spacing="1">비우기</text>
         </g>
       </svg>
     </div>
@@ -357,15 +362,15 @@ const DB_SEATS    = "seating-v1/seats";
 const DB_ANNOUNCE = "seating-v1/announce";
 const DB_EVENT    = "seating-v1/event";
 
-const LEADERS = ["정윤","두환","서연","길수","동관","지원","영균","지훈"];
+const LEADERS = ["정윤","두환","서연","길수","동관","지원"];
 const MEMBERS = ["민주","해원","정환","보경","태명","영서","우석","제현","주경","찬희","창희","현진","후조","지혜","원희","해민","영또","민태","새한","정현","호현","지우","승하"];
-const PW_VIEWER="0911", PW_HOST="990911";
+const PW_VIEWER="999999", PW_HOST="990911";
 
-// 모든 자리 목록 (SVG id와 1:1 매칭)
-const ALL_SEAT_IDS = ["A1","A2","A3","A4","B1","B2","B3","B4","C1","C2","C3","C4","D1","D2","D3","D4","E1","E2","E3","E4","F1","F2","F3","F4","G1","G2","G3","G4","H1","H2","H3","H4"];
-// 테이블별 자리
-const TABLE_SEATS = {A:["A1","A2","A3","A4"],B:["B1","B2","B3","B4"],C:["C1","C2","C3","C4"],D:["D1","D2","D3","D4"],E:["E1","E2","E3","E4"],F:["F1","F2","F3","F4"],G:["G1","G2","G3","G4"],H:["H1","H2","H3","H4"]};
-const TABLE_IDS = ["A","B","C","D","E","F","G","H"];
+// 모든 자리 목록 (SVG id와 1:1 매칭) — H 테이블은 비워둠 (사용 안 함)
+const ALL_SEAT_IDS = ["A1","A2","A3","A4","B1","B2","B3","B4","C1","C2","C3","C4","D1","D2","D3","D4","E1","E2","E3","E4","E5","F1","F2","F3","F4","G1","G2","G3","G4"];
+// 테이블별 자리 (H 제외 — 항상 비움)
+const TABLE_SEATS = {A:["A1","A2","A3","A4"],B:["B1","B2","B3","B4"],C:["C1","C2","C3","C4"],D:["D1","D2","D3","D4"],E:["E1","E2","E3","E4","E5"],F:["F1","F2","F3","F4"],G:["G1","G2","G3","G4"]};
+const TABLE_IDS = ["A","B","C","D","E","F","G"];
 
 function emptyAssigned(){const o={};ALL_SEAT_IDS.forEach(id=>{o[id]=null;});return o;}
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
